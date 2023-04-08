@@ -1,0 +1,22 @@
+<header class="header">
+  <h1 class="title">
+    <b>W</b>eb <b>I</b>mage <b>V</b>iewer <b>A</b>nd <b>E</b>ditor
+  </h1>
+</header>
+
+<div class="content">
+  <aside class="toolbar"></aside>
+  <section class="viewer">
+    <header class="menubar"></header>
+    <main class="main" [ngSwitch]="'clear'">
+      <button *ngSwitchCase="'clear'" type="button" class="loader">
+        <p>Drop image here</p>
+        <p class="muted">- or -</p>
+        <p>Click to upload</p>
+      </button>
+      <canvas *ngSwitchCase="'open'" class="canvas"></canvas>
+      <div *ngSwitchDefault>UNSUPPORTED</div>
+    </main>
+    <footer></footer>
+  </section>
+</div>

@@ -1,0 +1,14 @@
+:host {
+  @apply w-full h-full;
+  @apply text-slate-500;
+}
+
+.loader {
+  @apply w-full h-full;
+  @apply flex flex-col;
+  @apply justify-center items-center;
+
+  .muted {
+    @apply text-slate-400;
+  }
+}

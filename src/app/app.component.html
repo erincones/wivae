@@ -5,18 +5,16 @@
 </header>
 
 <div class="content">
-  <aside class="toolbar"></aside>
+  <aside wivae-toolbar></aside>
   <section class="viewer">
-    <header class="menubar"></header>
+    <header wivae-menubar></header>
     <main class="main" [ngSwitch]="'clear'">
-      <button *ngSwitchCase="'clear'" type="button" class="loader">
-        <p>Drop image here</p>
-        <p class="muted">- or -</p>
-        <p>Click to upload</p>
-      </button>
-      <canvas *ngSwitchCase="'open'" class="canvas"></canvas>
-      <div *ngSwitchDefault>UNSUPPORTED</div>
+      <div *ngSwitchCase="'clear'" wivae-uploader></div>
+      <div *ngSwitchCase="'open'" wivae-canvas></div>
+      <div *ngSwitchCase="'unsupported'" wivae-message></div>
+      <div *ngSwitchDefault wivae-message></div>
     </main>
-    <footer></footer>
+    <footer wivae-statusbar></footer>
   </section>
+  <aside wivae-infobar></aside>
 </div>

@@ -1,0 +1,8 @@
+:host {
+  @apply h-1/3;
+  @apply md:w-80 md:h-auto;
+  @apply border-t-8 border-slate-600;
+  @apply md:border-t-0 md:border-l-8;
+  @apply bg-slate-100 overflow-auto;
+  @apply text-slate-800;
+}

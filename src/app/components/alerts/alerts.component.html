@@ -1,0 +1,14 @@
+<div
+  *ngFor="let alert of alerts.alerts.slice(-3); index as i"
+  [ngClass]="['alert', className(alert.type)]"
+>
+  <button
+    type="button"
+    title="Close"
+    class="close"
+    (click)="handleClick(alert.id)"
+  >
+    <span>&times;</span>
+  </button>
+  <p *ngFor="let line of alert.text.split('\n')">{{ line }}</p>
+</div>

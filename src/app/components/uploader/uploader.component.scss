@@ -1,14 +1,32 @@
 :host {
-  @apply w-full h-full;
+  @apply relative;
+  @apply h-full w-full;
   @apply text-slate-500;
 }
 
 .loader {
-  @apply w-full h-full;
+  @apply h-full w-full;
   @apply flex flex-col;
-  @apply justify-center items-center;
+  @apply items-center justify-center;
 
-  .muted {
-    @apply text-slate-400;
+  .content {
+    @apply px-12 py-6;
+    @apply border-2 border-dashed border-slate-500;
+
+    .muted {
+      @apply text-slate-400;
+    }
+  }
+}
+
+.loader.dragging {
+  @apply text-slate-300;
+
+  .content {
+    @apply border-slate-300;
+
+    .muted {
+      @apply text-slate-200;
+    }
   }
 }

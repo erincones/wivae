@@ -7,7 +7,7 @@
 .header {
   @apply px-2 py-1;
   @apply bg-slate-600;
-  @apply text-slate-100 text-center;
+  @apply text-center text-slate-100;
 
   .title {
     @apply text-xl font-bold;
@@ -15,17 +15,28 @@
 }
 
 .content {
-  @apply w-full h-full;
-  @apply flex flex-col flex-grow;
+  @apply h-full w-full;
+  @apply flex flex-grow flex-col;
   @apply md:flex-row;
   @apply overflow-hidden;
 
   .viewer {
-    @apply flex flex-col flex-grow;
+    @apply flex flex-grow flex-col;
     @apply overflow-hidden;
 
     .main {
       @apply flex-grow;
+
+      .message {
+        @apply h-full w-full;
+        @apply flex;
+        @apply items-center justify-center;
+        @apply leading-tight;
+
+        .link {
+          @apply font-bold text-sky-900 underline;
+        }
+      }
     }
   }
 }

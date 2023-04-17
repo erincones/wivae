@@ -8,11 +8,35 @@
   <aside wivae-toolbar></aside>
   <section class="viewer">
     <header wivae-menubar></header>
-    <main class="main" [ngSwitch]="'clear'">
-      <div *ngSwitchCase="'clear'" wivae-uploader></div>
-      <div *ngSwitchCase="'open'" wivae-canvas></div>
-      <div *ngSwitchCase="'unsupported'" wivae-message></div>
-      <div *ngSwitchDefault wivae-message></div>
+    <main class="main" [ngSwitch]="core.viewerStatus">
+      <div *ngSwitchCase="ViewerStatus.EMPTY" wivae-uploader></div>
+      <div *ngSwitchCase="ViewerStatus.OPEN" wivae-canvas></div>
+      <div *ngSwitchCase="ViewerStatus.UNSUPPORTED" class="message">
+        <pre> ______________________________
+/ Your system does not support \
+| <a title="Support details" href="https://caniuse.com/mdn-api_canvasrenderingcontext2d" target="_blank" rel="noopener noreferrer" class="link">WebGL2</a>.                      |
+|                              |
+| If you think this a mistake, |
+\ <a href="https://github.com/erincones/wivae/issues/new" target="_blank" rel="noopener noreferrer" class="link">create an new issue</a>.         /
+ ------------------------------
+        \   ^__^
+         \  (@@)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||</pre>
+      </div>
+      <div *ngSwitchDefault class="message">
+        <pre>
+ _______________
+< Unknown error >
+ ---------------
+        \   ^__^
+         \  (xx)\_______
+            (__)\       )\/\
+             U  ||----w |
+                ||     ||</pre
+        >
+      </div>
     </main>
     <footer wivae-statusbar></footer>
   </section>

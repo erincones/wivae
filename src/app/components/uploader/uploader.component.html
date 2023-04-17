@@ -1,5 +1,17 @@
-<button type="button" class="loader">
-  <p>Drop image here</p>
-  <p class="muted">- or -</p>
-  <p>Click to upload</p>
+<div wivae-alerts></div>
+<button
+  type="button"
+  (dragenter)="handleDrag($event)"
+  (dragover)="handleDrag($event)"
+  (dragleave)="handleDragLeave($event)"
+  (drop)="handleDrop($event)"
+  (click)="handleClick($event)"
+  class="loader"
+  [class.dragging]="dragging"
+>
+  <div class="content">
+    <p>Drop image here</p>
+    <p class="muted">- or -</p>
+    <p>Click to upload</p>
+  </div>
 </button>

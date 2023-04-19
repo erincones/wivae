@@ -24,15 +24,22 @@ export class CoreService {
     return this._image === undefined ? ViewerStatus.EMPTY : ViewerStatus.OPEN;
   }
 
+  public get image(): HTMLImageElement {
+    if (!(this._image instanceof HTMLImageElement))
+      throw new Error('Not image set.');
+
+    return this._image;
+  }
+
   public async openFile(file: File): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (!file.type.startsWith('image/')) {
-        reject('Not valid format\nFile name: ' + file.name);
+        reject(`Not valid format\nFile name: ${file.name}`);
       } else {
         if (this._image !== undefined) URL.revokeObjectURL(this._image.src);
         const image = new Image();
         image.onerror = () => {
-          reject('Unknown error\nFile name: ' + file.name);
+          reject(`Unknown error\nFile name: ${file.name}`);
         };
         image.onload = () => {
           this._image = image;

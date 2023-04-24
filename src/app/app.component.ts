@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FaConfig } from '@fortawesome/angular-fontawesome';
 import { CoreService } from './services/core.service';
 import { ViewerStatus } from './enums/viewer-status';
 
@@ -10,5 +11,11 @@ import { ViewerStatus } from './enums/viewer-status';
 export class AppComponent {
   public readonly ViewerStatus = ViewerStatus;
 
-  public constructor(public core: CoreService) {}
+  public constructor(private _faConfig: FaConfig, private _core: CoreService) {
+    this._faConfig.fixedWidth = true;
+  }
+
+  public get viewerStatus(): ViewerStatus {
+    return this._core.viewerStatus;
+  }
 }

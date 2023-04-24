@@ -8,7 +8,7 @@
   <aside wivae-toolbar></aside>
   <section class="viewer">
     <header wivae-menubar></header>
-    <main class="main" [ngSwitch]="core.viewerStatus">
+    <main class="main" [ngSwitch]="viewerStatus">
       <div *ngSwitchCase="ViewerStatus.EMPTY" wivae-uploader></div>
       <div *ngSwitchCase="ViewerStatus.OPEN" wivae-canvas></div>
       <div *ngSwitchCase="ViewerStatus.UNSUPPORTED" class="message">

@@ -4,8 +4,8 @@
   (dragenter)="handleDrag($event)"
   (dragover)="handleDrag($event)"
   (dragleave)="handleDragLeave($event)"
-  (drop)="handleDrop($event)"
-  (click)="handleClick($event)"
+  (drop)="handleFile($event)"
+  (click)="handleFile()"
   class="loader"
   [class.dragging]="dragging"
 >

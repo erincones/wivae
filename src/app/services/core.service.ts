@@ -31,9 +31,33 @@ export class CoreService {
     return this._image;
   }
 
-  public async openFile(file: File): Promise<void> {
+  public async uploadFile(e?: DragEvent): Promise<void> {
+    if (e instanceof DragEvent) {
+      e.preventDefault();
+      e.stopPropagation();
+      return this.openFile(e.dataTransfer?.files[0]);
+    } else {
+      return new Promise<void>((resolve, reject) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = () => {
+          this.openFile(input.files?.[0])
+            .then(resolve)
+            .catch((e) => {
+              reject(e);
+            });
+        };
+        input.click();
+      });
+    }
+  }
+
+  public async openFile(file?: File): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (!file.type.startsWith('image/')) {
+      if (!(file instanceof File)) {
+        reject('Not valid file.');
+      } else if (!file.type.startsWith('image/')) {
         reject(`Not valid format\nFile name: ${file.name}`);
       } else {
         if (this._image !== undefined) URL.revokeObjectURL(this._image.src);

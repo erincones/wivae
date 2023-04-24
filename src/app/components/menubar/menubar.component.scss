@@ -4,3 +4,18 @@
   @apply border-b border-slate-400;
   @apply bg-slate-300;
 }
+
+.button {
+  @apply text-slate-800 hover:text-blue-800 active:text-blue-900;
+  @apply disabled:text-slate-400;
+  @apply focus:ring;
+}
+
+.separator {
+  @apply mx-2 my-1;
+  @apply border-l border-slate-400;
+}
+
+.spawn {
+  @apply flex-grow;
+}

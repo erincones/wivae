@@ -75,6 +75,13 @@ export class EditorService {
   }
 
   public get gl(): WebGL2RenderingContext {
+    try {
+      this._core.image;
+    } catch (e) {
+      this._gl = null;
+      throw e;
+    }
+
     if (this._gl === null)
       throw new Error('Could not get the WebGL2 rendering context.');
 
@@ -138,5 +145,10 @@ export class EditorService {
     const gl = this.gl;
     gl.viewport(0, 0, width, height);
     this._draw();
+  }
+
+  public closeImage(): void {
+    this._gl = null;
+    this._core.closeFile();
   }
 }

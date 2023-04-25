@@ -8,10 +8,12 @@
   @apply h-full w-full;
   @apply flex flex-col;
   @apply items-center justify-center;
+  @apply bg-slate-50;
 
   .content {
     @apply px-12 py-6;
     @apply border-2 border-dashed border-slate-500;
+    @apply bg-white;
 
     .muted {
       @apply text-slate-400;

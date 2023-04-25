@@ -1,46 +1,99 @@
-<button type="button" title="Upload" [disabled]="unusable" (click)="handleFile()" class="button">
+<button
+  type="button"
+  title="Upload"
+  [disabled]="unusable"
+  (click)="handleFile()"
+  class="button"
+>
   <fa-icon [icon]="faUpload"></fa-icon>
 </button>
 <button type="button" title="Download" [disabled]="notOpen" class="button">
   <fa-icon [icon]="faDownload"></fa-icon>
 </button>
-<button type="button" title="Close" [disabled]="notOpen" (click)="close()" class="button">
+<button
+  type="button"
+  title="Close"
+  [disabled]="notOpen"
+  (click)="editor.closeImage()"
+  class="button"
+>
   <fa-icon [icon]="faTrash"></fa-icon>
 </button>
 
 <span class="spawn"></span>
 
-<button type="button" title="Fit to canvas" [disabled]="notOpen" class="button">
+<button
+  type="button"
+  title="Fit to canvas"
+  [disabled]="notOpen"
+  (click)="editor.fit()"
+  class="button"
+  [class.pressed]="editor.fitted"
+>
   <fa-layers>
     <fa-icon [icon]="faSquare"></fa-icon>
     <fa-icon [icon]="faExpand" transform="shrink-4"></fa-icon>
   </fa-layers>
 </button>
-<button type="button" title="Real size" [disabled]="notOpen" class="button">
+<button
+  type="button"
+  title="Real size"
+  [disabled]="notOpen"
+  (click)="editor.realSize()"
+  class="button"
+  [class.pressed]="editor.realSized"
+>
   <fa-layers>
     <fa-icon [icon]="faSquare"></fa-icon>
     <fa-icon [icon]="fa1" transform="shrink-4"></fa-icon>
   </fa-layers>
 </button>
-<button type="button" title="Zoom in" [disabled]="notOpen" class="button">
+<button
+  type="button"
+  title="Zoom in"
+  [disabled]="notOpen || !editor.canZoomIn"
+  (click)="editor.zoomIn()"
+  class="button"
+>
   <fa-icon [icon]="faMagnifyingGlassPlus"></fa-icon>
 </button>
-<button type="button" title="Zoom out" [disabled]="notOpen" class="button">
+<button
+  type="button"
+  title="Zoom out"
+  [disabled]="notOpen || !editor.canZoomOut"
+  (click)="editor.zoomOut()"
+  class="button"
+>
   <fa-icon [icon]="faMagnifyingGlassMinus"></fa-icon>
 </button>
 
 <span class="separator"></span>
 
-<button type="button" title="Rotate right 90°" [disabled]="notOpen" class="button">
+<button
+  type="button"
+  title="Rotate right 90°"
+  [disabled]="notOpen"
+  class="button"
+>
   <fa-icon [icon]="faRotateRight"></fa-icon>
 </button>
-<button type="button" title="Rotate left 90°" [disabled]="notOpen" class="button">
+<button
+  type="button"
+  title="Rotate left 90°"
+  [disabled]="notOpen"
+  class="button"
+>
   <fa-icon [icon]="faRotateLeft"></fa-icon>
 </button>
 <button type="button" title="Flip vertical" [disabled]="notOpen" class="button">
   <fa-icon [icon]="faRightLeft" [rotate]="90"></fa-icon>
 </button>
-<button type="button" title="Flip horizontal" [disabled]="notOpen" class="button">
+<button
+  type="button"
+  title="Flip horizontal"
+  [disabled]="notOpen"
+  class="button"
+>
   <fa-icon [icon]="faRightLeft"></fa-icon>
 </button>
 

@@ -28,7 +28,7 @@ export class CoreService {
     return this._supported;
   }
 
-  public get viewerStatus(): ViewerStatus {
+  public get status(): ViewerStatus {
     if (!this.supported) return ViewerStatus.UNSUPPORTED;
     return this._image === undefined ? ViewerStatus.EMPTY : ViewerStatus.OPEN;
   }

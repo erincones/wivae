@@ -20,33 +20,10 @@ export class StatusbarComponent {
   public readonly faPenRuler: IconDefinition;
   public readonly faInfo: IconDefinition;
 
-  public constructor(
-    private _core: CoreService,
-    private _editor: EditorService,
-  ) {
+  public constructor(public core: CoreService, public editor: EditorService) {
     this.faCaretLeft = faCaretLeft;
     this.faCaretRight = faCaretRight;
     this.faPenRuler = faPenRuler;
     this.faInfo = faInfo;
-  }
-
-  public get showToolbar(): boolean {
-    return this._core.showToolbar;
-  }
-
-  public get showInfobar(): boolean {
-    return this._core.showInfobar;
-  }
-
-  public get status(): string {
-    return this._editor.status;
-  }
-
-  public toggleToolBar(): void {
-    this._core.toggleToolbar();
-  }
-
-  public toggleInfoBar(): void {
-    this._core.toggleInfobar();
   }
 }

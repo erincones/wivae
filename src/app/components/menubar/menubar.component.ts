@@ -44,9 +44,9 @@ export class MenubarComponent {
   public readonly faTrash: IconDefinition;
 
   public constructor(
-    private _core: CoreService,
-    private _editor: EditorService,
     private _alerts: AlertsService,
+    public core: CoreService,
+    public editor: EditorService,
   ) {
     this.fa1 = fa1;
     this.faCircle = faCircle;
@@ -66,17 +66,17 @@ export class MenubarComponent {
 
   public get unusable(): boolean {
     return (
-      this._core.viewerStatus === ViewerStatus.UNSUPPORTED ||
-      this._core.viewerStatus === ViewerStatus.ERROR
+      this.core.status === ViewerStatus.UNSUPPORTED ||
+      this.core.status === ViewerStatus.ERROR
     );
   }
 
   public get notOpen(): true | null {
-    return this._core.viewerStatus !== ViewerStatus.OPEN || null;
+    return this.core.status !== ViewerStatus.OPEN || null;
   }
 
   public handleFile(e?: DragEvent): void {
-    this._core
+    this.core
       .uploadFile(e)
       .then(() => {
         this._alerts.clear();
@@ -84,9 +84,5 @@ export class MenubarComponent {
       .catch((e: string) => {
         this._alerts.push(AlertType.ERROR, `Cannot open the given file: ${e}`);
       });
-  }
-
-  public close(): void {
-    this._editor.closeImage();
   }
 }

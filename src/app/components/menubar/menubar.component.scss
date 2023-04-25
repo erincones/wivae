@@ -12,6 +12,11 @@
   @apply focus:ring;
 }
 
+.button.pressed {
+  @apply text-blue-700 hover:text-blue-800 active:text-blue-900;
+  @apply disabled:text-slate-400;
+}
+
 .separator {
   @apply mx-2 my-1;
   @apply border-l border-slate-400;

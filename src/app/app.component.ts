@@ -11,19 +11,7 @@ import { ViewerStatus } from './enums/viewer-status';
 export class AppComponent {
   public readonly ViewerStatus = ViewerStatus;
 
-  public constructor(private _faConfig: FaConfig, private _core: CoreService) {
+  public constructor(private _faConfig: FaConfig, public core: CoreService) {
     this._faConfig.fixedWidth = true;
-  }
-
-  public get viewerStatus(): ViewerStatus {
-    return this._core.viewerStatus;
-  }
-
-  public get showToolbar(): boolean {
-    return this._core.showToolbar;
-  }
-
-  public get showInfobar(): boolean {
-    return this._core.showInfobar;
   }
 }

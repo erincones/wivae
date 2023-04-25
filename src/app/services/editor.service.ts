@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import baseVert from '../shaders/base.vert';
-import baseFrag from '../shaders/base.frag';
+import baseVert from '../shaders/viewer.vert';
+import baseFrag from '../shaders/viewer.frag';
 import { CoreService } from './core.service';
+import { mat4, vec3 } from '../libs/lar';
+import { GLSLProgram } from '../classes/glslprogram';
 
 @Injectable({
   providedIn: 'root',
@@ -14,74 +16,43 @@ export class EditorService {
 
   private static readonly _INDEXES = new Int8Array([0, 1, 2, 3]);
 
-  private static readonly _ZOOM_FACTOR = 1.25;
+  private static readonly _ZOOM_FACTOR = 1.1;
 
-  private static readonly _MAX_ZOOM = 4;
+  private static readonly _MAX_ZOOM = 50;
 
   private _gl: WebGL2RenderingContext | null;
 
-  private _bg: [number, number, number, number];
+  private _viewer: GLSLProgram;
+
+  private _bg: vec3;
+
+  private _ratio: vec3;
 
   private _zoom: number;
 
-  private _min_zoom: number;
+  private _minZoom: number;
+
+  private _fitted: boolean;
 
   public constructor(private _core: CoreService) {
     this._gl = null;
-    this._bg = [1, 1, 1, 1];
+    this._viewer = new GLSLProgram(baseVert, baseFrag);
+    this._bg = vec3.new(248, 250, 252);
+    this._ratio = vec3.zero();
     this._zoom = 1;
-    this._min_zoom = 1;
+    this._minZoom = 1;
+    this._fitted = true;
   }
 
-  private _createShader(
-    type: WebGL2RenderingContext['VERTEX_SHADER' | 'FRAGMENT_SHADER'],
-    src: string,
-  ): WebGLShader {
+  private _updateView(): void {
     const gl = this.gl;
-    const stage = type === gl.VERTEX_SHADER ? 'vertex' : 'fragment';
-    const shader = gl.createShader(type);
+    const view = mat4.scale(mat4.new(1), vec3.scale(this._ratio, this._zoom));
 
-    if (shader === null)
-      throw new Error(`Could not create the ${stage} shader`);
-
-    gl.shaderSource(shader, src);
-    gl.compileShader(shader);
-
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      const message = `Could not compile the given ${stage} shader:\n${
-        gl.getShaderInfoLog(shader) || 'unknown'
-      }`;
-
-      gl.deleteShader(shader);
-      throw new Error(message);
-    }
-
-    return shader;
-  }
-
-  private _createProgram(vertSrc: string, fragSrc: string): WebGLProgram {
-    const gl = this.gl;
-    const program = gl.createProgram();
-
-    if (program === null) throw new Error('Could not create the program.');
-
-    const vertShader = this._createShader(gl.VERTEX_SHADER, vertSrc);
-    const fragShader = this._createShader(gl.FRAGMENT_SHADER, fragSrc);
-
-    gl.attachShader(program, vertShader);
-    gl.attachShader(program, fragShader);
-    gl.linkProgram(program);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      const message = `Could not link the program\n: ${
-        gl.getProgramInfoLog(program) || 'unknown'
-      }`;
-
-      gl.deleteProgram(program);
-      throw new Error(message);
-    }
-
-    return program;
+    gl.uniformMatrix4fv(
+      this._viewer.getUniformLocation(gl, 'u_view'),
+      false,
+      view,
+    );
   }
 
   private _draw(): void {
@@ -109,12 +80,28 @@ export class EditorService {
     return this._zoom;
   }
 
-  public get status(): string {
+  public get canZoomIn(): boolean {
+    return this._zoom < EditorService._MAX_ZOOM;
+  }
+
+  public get canZoomOut(): boolean {
+    return this._zoom > this._minZoom;
+  }
+
+  public get fitted(): boolean {
+    return this._fitted;
+  }
+
+  public get realSized(): boolean {
+    return this._zoom === 1;
+  }
+
+  public get status(): ReadonlyArray<string> {
     try {
       this.gl;
-      return `Zoom: ${(this._zoom - 1) * 100}%`;
+      return [`Changes: ${0}`, `Zoom: ${(this._zoom * 100).toFixed(2)}%`];
     } catch (e) {
-      return 'No image open yet';
+      return ['No image open yet'];
     }
   }
 
@@ -122,12 +109,12 @@ export class EditorService {
     this._gl = canvas.getContext('webgl2');
     const gl = this.gl;
 
-    gl.clearColor(...this._bg);
+    this._viewer.link(gl);
+    this._viewer.use(gl);
+
+    gl.clearColor(...vec3.scale(this._bg, 1 / 255), 1);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-    const program = this._createProgram(baseVert, baseFrag);
-    gl.useProgram(program);
 
     const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
@@ -165,30 +152,74 @@ export class EditorService {
       gl.UNSIGNED_BYTE,
       this._core.image,
     );
-    gl.uniform1i(gl.getUniformLocation(program, 'u_img'), 0);
+    gl.uniform1i(this._viewer.getUniformLocation(gl, 'u_img'), 0);
+
+    this._zoom = 1;
+    this._minZoom = 1;
+    this._fitted = true;
   }
 
   public resizeViewport(width: number, height: number): void {
     const gl = this.gl;
+    const image = this._core.image;
+
+    const ratioW = image.width / width;
+    const ratioH = image.height / height;
+    const maxRatio = ratioW > ratioH ? ratioW : ratioH;
+
+    this._ratio = vec3.new(ratioW, ratioH, 1);
+    this._minZoom = maxRatio <= 1 ? 1 : 1 / maxRatio;
+
+    if (this._zoom < this._minZoom) this._zoom = this._minZoom;
+    if (this._fitted) this._zoom = this._minZoom;
+
     gl.viewport(0, 0, width, height);
+    this._updateView();
+    this._draw();
+  }
+
+  public fit(): void {
+    this._zoom = this._minZoom;
+    this._fitted = true;
+
+    this._updateView();
+    this._draw();
+  }
+
+  public realSize(): void {
+    this._zoom = 1;
+    this._fitted = false;
+
+    this._updateView();
     this._draw();
   }
 
   public zoomIn(): void {
     this._zoom *= EditorService._ZOOM_FACTOR;
+    this._fitted = false;
     if (this._zoom > EditorService._MAX_ZOOM) {
       this._zoom = EditorService._MAX_ZOOM;
     }
+
+    this._updateView();
+    this._draw();
   }
 
   public zoomOut(): void {
     this._zoom /= EditorService._ZOOM_FACTOR;
-    if (this._zoom > EditorService._MAX_ZOOM) {
-      this._zoom = EditorService._MAX_ZOOM;
+    if (this._zoom < this._minZoom) {
+      this._zoom = this._minZoom;
+      this._fitted = true;
+    } else {
+      this._fitted = false;
     }
+
+    this._updateView();
+    this._draw();
   }
 
   public closeImage(): void {
+    this._viewer.delete(this.gl);
     this._gl = null;
     this._core.closeFile();
   }

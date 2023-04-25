@@ -12,6 +12,10 @@
   @apply focus:ring;
 }
 
+.field {
+  @apply mr-4;
+}
+
 .separator {
   @apply mx-2 my-1;
   @apply border-l border-slate-400;

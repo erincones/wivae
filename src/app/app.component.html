@@ -5,10 +5,10 @@
 </header>
 
 <div class="content">
-  <aside *ngIf="showToolbar" wivae-toolbar></aside>
+  <aside *ngIf="core.showToolbar" wivae-toolbar></aside>
   <section class="viewer">
     <header wivae-menubar></header>
-    <main class="main" [ngSwitch]="viewerStatus">
+    <main class="main" [ngSwitch]="core.status">
       <div *ngSwitchCase="ViewerStatus.EMPTY" wivae-uploader></div>
       <div *ngSwitchCase="ViewerStatus.OPEN" wivae-canvas></div>
       <div *ngSwitchCase="ViewerStatus.UNSUPPORTED" class="message">
@@ -40,5 +40,5 @@
     </main>
     <footer wivae-statusbar></footer>
   </section>
-  <aside *ngIf="showInfobar" wivae-infobar></aside>
+  <aside *ngIf="core.showInfobar" wivae-infobar></aside>
 </div>

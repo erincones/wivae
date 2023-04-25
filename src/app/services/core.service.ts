@@ -9,6 +9,15 @@ export class CoreService {
 
   private _image?: HTMLImageElement;
 
+  private _showToolbar: boolean;
+
+  private _showInfobar: boolean;
+
+  public constructor() {
+    this._showToolbar = true;
+    this._showInfobar = true;
+  }
+
   public get supported(): boolean {
     if (this._supported === undefined) {
       const canvas = document.createElement('canvas');
@@ -29,6 +38,14 @@ export class CoreService {
       throw new Error('Not image set.');
 
     return this._image;
+  }
+
+  public get showToolbar(): boolean {
+    return this._showToolbar;
+  }
+
+  public get showInfobar(): boolean {
+    return this._showInfobar;
   }
 
   public async uploadFile(e?: DragEvent): Promise<void> {
@@ -79,5 +96,13 @@ export class CoreService {
       URL.revokeObjectURL(this._image.src);
       delete this._image;
     }
+  }
+
+  public toggleToolbar(): void {
+    this._showToolbar = !this._showToolbar;
+  }
+
+  public toggleInfobar(): void {
+    this._showInfobar = !this._showInfobar;
   }
 }

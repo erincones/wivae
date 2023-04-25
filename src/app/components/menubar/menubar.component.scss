@@ -3,10 +3,11 @@
   @apply px-2 py-1;
   @apply border-b border-slate-400;
   @apply bg-slate-300;
+  @apply text-slate-800;
 }
 
 .button {
-  @apply text-slate-800 hover:text-blue-800 active:text-blue-900;
+  @apply hover:text-blue-800 active:text-blue-900;
   @apply disabled:text-slate-400;
   @apply focus:ring;
 }

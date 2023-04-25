@@ -18,4 +18,12 @@ export class AppComponent {
   public get viewerStatus(): ViewerStatus {
     return this._core.viewerStatus;
   }
+
+  public get showToolbar(): boolean {
+    return this._core.showToolbar;
+  }
+
+  public get showInfobar(): boolean {
+    return this._core.showInfobar;
+  }
 }

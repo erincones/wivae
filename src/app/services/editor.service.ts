@@ -7,13 +7,30 @@ import { CoreService } from './core.service';
   providedIn: 'root',
 })
 export class EditorService {
+  private static readonly _SQUARE = new Float32Array([
+    -1.0, 1.0, 0.0, 1.0, -1.0, -1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
+    1.0, 0.0,
+  ]);
+
+  private static readonly _INDEXES = new Int8Array([0, 1, 2, 3]);
+
+  private static readonly _ZOOM_FACTOR = 1.25;
+
+  private static readonly _MAX_ZOOM = 4;
+
   private _gl: WebGL2RenderingContext | null;
 
   private _bg: [number, number, number, number];
 
+  private _zoom: number;
+
+  private _min_zoom: number;
+
   public constructor(private _core: CoreService) {
     this._gl = null;
     this._bg = [1, 1, 1, 1];
+    this._zoom = 1;
+    this._min_zoom = 1;
   }
 
   private _createShader(
@@ -88,6 +105,19 @@ export class EditorService {
     return this._gl;
   }
 
+  public get zoom(): number {
+    return this._zoom;
+  }
+
+  public get status(): string {
+    try {
+      this.gl;
+      return `Zoom: ${(this._zoom - 1) * 100}%`;
+    } catch (e) {
+      return 'No image open yet';
+    }
+  }
+
   public setup(canvas: HTMLCanvasElement): void {
     this._gl = canvas.getContext('webgl2');
     const gl = this.gl;
@@ -99,23 +129,20 @@ export class EditorService {
     const program = this._createProgram(baseVert, baseFrag);
     gl.useProgram(program);
 
-    const data = new Float32Array([
-      -1.0, 1.0, 0.0, 1.0, -1.0, -1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
-      1.0, 0.0,
-    ]);
-
-    const index = new Int8Array([0, 1, 2, 3]);
-
     const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
 
     const vbo = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, EditorService._SQUARE, gl.STATIC_DRAW);
 
     const ebo = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, index, gl.STATIC_DRAW);
+    gl.bufferData(
+      gl.ELEMENT_ARRAY_BUFFER,
+      EditorService._INDEXES,
+      gl.STATIC_DRAW,
+    );
 
     gl.enableVertexAttribArray(0);
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 16, 0);
@@ -145,6 +172,20 @@ export class EditorService {
     const gl = this.gl;
     gl.viewport(0, 0, width, height);
     this._draw();
+  }
+
+  public zoomIn(): void {
+    this._zoom *= EditorService._ZOOM_FACTOR;
+    if (this._zoom > EditorService._MAX_ZOOM) {
+      this._zoom = EditorService._MAX_ZOOM;
+    }
+  }
+
+  public zoomOut(): void {
+    this._zoom /= EditorService._ZOOM_FACTOR;
+    if (this._zoom > EditorService._MAX_ZOOM) {
+      this._zoom = EditorService._MAX_ZOOM;
+    }
   }
 
   public closeImage(): void {

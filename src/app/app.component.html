@@ -5,7 +5,7 @@
 </header>
 
 <div class="content">
-  <aside wivae-toolbar></aside>
+  <aside *ngIf="showToolbar" wivae-toolbar></aside>
   <section class="viewer">
     <header wivae-menubar></header>
     <main class="main" [ngSwitch]="viewerStatus">
@@ -40,5 +40,5 @@
     </main>
     <footer wivae-statusbar></footer>
   </section>
-  <aside wivae-infobar></aside>
+  <aside *ngIf="showInfobar" wivae-infobar></aside>
 </div>

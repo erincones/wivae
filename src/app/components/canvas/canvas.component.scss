@@ -2,3 +2,10 @@
   @apply w-full h-full;
   @apply relative;
 }
+
+.canvas {
+  @apply cursor-grab;
+}
+.canvas.grabbing {
+  @apply cursor-grabbing;
+}

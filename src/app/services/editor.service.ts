@@ -22,9 +22,13 @@ export class EditorService {
 
   private _gl: WebGL2RenderingContext | null;
 
-  private _viewer: GLSLProgram;
+  private _viewerProgram: GLSLProgram;
 
   private _bg: vec3;
+
+  private _imageSize: vec3;
+
+  private _position: vec3;
 
   private _ratio: vec3;
 
@@ -36,8 +40,10 @@ export class EditorService {
 
   public constructor(private _core: CoreService) {
     this._gl = null;
-    this._viewer = new GLSLProgram(baseVert, baseFrag);
+    this._viewerProgram = new GLSLProgram(baseVert, baseFrag);
     this._bg = vec3.new(248, 250, 252);
+    this._imageSize = vec3.zero();
+    this._position = vec3.zero();
     this._ratio = vec3.zero();
     this._zoom = 1;
     this._minZoom = 1;
@@ -46,10 +52,14 @@ export class EditorService {
 
   private _updateView(): void {
     const gl = this.gl;
-    const view = mat4.scale(mat4.new(1), vec3.scale(this._ratio, this._zoom));
+
+    const view = mat4.translate(
+      mat4.scale(mat4.new(1), vec3.scale(this._ratio, this._zoom)),
+      this._position,
+    );
 
     gl.uniformMatrix4fv(
-      this._viewer.getUniformLocation(gl, 'u_view'),
+      this._viewerProgram.getUniformLocation(gl, 'u_view'),
       false,
       view,
     );
@@ -108,9 +118,14 @@ export class EditorService {
   public setup(canvas: HTMLCanvasElement): void {
     this._gl = canvas.getContext('webgl2');
     const gl = this.gl;
+    const image = this._core.image;
 
-    this._viewer.link(gl);
-    this._viewer.use(gl);
+    this._fitted = true;
+    this._imageSize = vec3.new(image.width, image.height, 1);
+    this._position = vec3.zero();
+
+    this._viewerProgram.link(gl);
+    this._viewerProgram.use(gl);
 
     gl.clearColor(...vec3.scale(this._bg, 1 / 255), 1);
     gl.enable(gl.BLEND);
@@ -144,19 +159,8 @@ export class EditorService {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      this._core.image,
-    );
-    gl.uniform1i(this._viewer.getUniformLocation(gl, 'u_img'), 0);
-
-    this._zoom = 1;
-    this._minZoom = 1;
-    this._fitted = true;
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.uniform1i(this._viewerProgram.getUniformLocation(gl, 'u_img'), 0);
   }
 
   public resizeViewport(width: number, height: number): void {
@@ -167,7 +171,7 @@ export class EditorService {
     const ratioH = image.height / height;
     const maxRatio = ratioW > ratioH ? ratioW : ratioH;
 
-    this._ratio = vec3.new(ratioW, ratioH, 1);
+    this._ratio = vec3.new(ratioW, ratioH, 0);
     this._minZoom = maxRatio <= 1 ? 1 : 1 / maxRatio;
 
     if (this._zoom < this._minZoom) this._zoom = this._minZoom;
@@ -178,23 +182,22 @@ export class EditorService {
     this._draw();
   }
 
-  public fit(): void {
-    this._zoom = this._minZoom;
-    this._fitted = true;
-
-    this._updateView();
-    this._draw();
-  }
-
-  public realSize(): void {
-    this._zoom = 1;
-    this._fitted = false;
+  public translate(movement: vec3): void {
+    this._position = vec3.add(
+      this._position,
+      vec3.div(
+        vec3.scale(movement, (2 * devicePixelRatio) / this._zoom),
+        this._imageSize,
+      ),
+    );
 
     this._updateView();
     this._draw();
   }
 
   public zoomIn(): void {
+    if (!this.canZoomIn) return;
+
     this._zoom *= EditorService._ZOOM_FACTOR;
     this._fitted = false;
     if (this._zoom > EditorService._MAX_ZOOM) {
@@ -206,6 +209,8 @@ export class EditorService {
   }
 
   public zoomOut(): void {
+    if (!this.canZoomOut) return;
+
     this._zoom /= EditorService._ZOOM_FACTOR;
     if (this._zoom < this._minZoom) {
       this._zoom = this._minZoom;
@@ -218,8 +223,22 @@ export class EditorService {
     this._draw();
   }
 
+  public fit(): void {
+    this._zoom = this._minZoom;
+    this._fitted = true;
+    this._updateView();
+    this._draw();
+  }
+
+  public realSize(): void {
+    this._zoom = 1;
+    this._fitted = false;
+    this._updateView();
+    this._draw();
+  }
+
   public closeImage(): void {
-    this._viewer.delete(this.gl);
+    this._viewerProgram.delete(this.gl);
     this._gl = null;
     this._core.closeFile();
   }

@@ -1,2 +1,9 @@
 <div wivae-alerts></div>
-<canvas #canvas></canvas>
+<canvas
+  #canvas
+  class="canvas"
+  [class.grabbing]="moving"
+  (mousedown)="handleMouseDown($event)"
+  (contextmenu)="dumb($event)"
+  (wheel)="handleWheel($event)"
+></canvas>

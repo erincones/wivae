@@ -28,6 +28,22 @@ export const vec3 = {
     return new Float32Array([x, y, z]) as unknown as vec3;
   },
 
+  add: (a: Readonly<vec3>, b: Readonly<vec3>): vec3 => {
+    return new Float32Array([
+      a[0] + b[0],
+      a[1] + b[1],
+      a[2] + b[2],
+    ]) as unknown as vec3;
+  },
+
+  div: (a: Readonly<vec3>, b: Readonly<vec3>): vec3 => {
+    return new Float32Array([
+      a[0] / b[0],
+      a[1] / b[1],
+      a[2] / b[2],
+    ]) as unknown as vec3;
+  },
+
   scale: (a: Readonly<vec3>, scale: number): vec3 => {
     return new Float32Array([
       a[0] * scale,
@@ -38,10 +54,6 @@ export const vec3 = {
 };
 
 export const mat4 = {
-  zero: (): mat4 => {
-    return new Float32Array(16) as unknown as mat4;
-  },
-
   new: (x: number): mat4 => {
     return new Float32Array([
       x,
@@ -63,24 +75,63 @@ export const mat4 = {
     ]) as unknown as mat4;
   },
 
-  scale: (a: mat4, scale: vec3): mat4 => {
+  scale: (a: Readonly<mat4>, scale: Readonly<vec3>): mat4 => {
+    const x = scale[0];
+    const y = scale[1];
+    const z = scale[2];
     return new Float32Array([
-      a[0] * scale[0],
-      a[1] * scale[0],
-      a[2] * scale[0],
-      a[3],
-      a[4] * scale[1],
-      a[5] * scale[1],
-      a[6] * scale[1],
-      a[7],
-      a[8] * scale[2],
-      a[9] * scale[2],
-      a[10] * scale[2],
-      a[11],
+      a[0] * x,
+      a[1] * x,
+      a[2] * x,
+      a[3] * x,
+      a[4] * y,
+      a[5] * y,
+      a[6] * y,
+      a[7] * y,
+      a[8] * z,
+      a[9] * z,
+      a[10] * z,
+      a[11] * z,
       a[12],
       a[13],
       a[14],
       a[15],
+    ]) as unknown as mat4;
+  },
+
+  translate: (a: Readonly<mat4>, translation: Readonly<vec3>): mat4 => {
+    const x = translation[0];
+    const y = translation[1];
+    const z = translation[2];
+    const a0 = a[0];
+    const a1 = a[1];
+    const a2 = a[2];
+    const a3 = a[3];
+    const a4 = a[4];
+    const a5 = a[5];
+    const a6 = a[6];
+    const a7 = a[7];
+    const a8 = a[8];
+    const a9 = a[9];
+    const a10 = a[10];
+    const a11 = a[11];
+    return new Float32Array([
+      a0,
+      a1,
+      a2,
+      a3,
+      a4,
+      a5,
+      a6,
+      a7,
+      a8,
+      a9,
+      a10,
+      a11,
+      a0 * x + a4 * y + a8 * z + a[12],
+      a1 * x + a5 * y + a9 * z + a[13],
+      a2 * x + a6 * y + a10 * z + a[14],
+      a3 * x + a7 * y + a11 * z + a[15],
     ]) as unknown as mat4;
   },
 };

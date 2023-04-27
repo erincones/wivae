@@ -26,6 +26,8 @@ export class EditorService {
 
   private _bg: vec3;
 
+  private _canvasSize: vec3;
+
   private _imageSize: vec3;
 
   private _position: vec3;
@@ -42,12 +44,64 @@ export class EditorService {
     this._gl = null;
     this._viewerProgram = new GLSLProgram(baseVert, baseFrag);
     this._bg = vec3.new(248, 250, 252);
+    this._canvasSize = vec3.zero();
     this._imageSize = vec3.zero();
     this._position = vec3.zero();
     this._ratio = vec3.zero();
     this._zoom = 1;
     this._minZoom = 1;
     this._fitted = true;
+  }
+
+  private _project(point: vec3): vec3 {
+    return vec3.div(
+      vec3.scale(point, (2 * devicePixelRatio) / this._zoom),
+      this._imageSize,
+    );
+  }
+
+  private _translatePosition(translation: vec3): boolean {
+    const offset = vec3.div(
+      vec3.scale(
+        vec3.sub(vec3.scale(this._imageSize, this._zoom), this._canvasSize),
+        1 / this._zoom,
+      ),
+      this._imageSize,
+    );
+
+    const position = vec3.add(this._position, translation);
+    const delta = vec3.abs(position);
+    const offX = offset[0];
+    const offY = offset[1];
+
+    if (offX <= 0) position[0] = 0;
+    else if (delta[0] > offX) position[0] = position[0] > 0 ? offX : -offX;
+
+    if (offY <= 0) position[1] = 0;
+    else if (delta[1] > offY) position[1] = position[1] > 0 ? offY : -offY;
+
+    if (!vec3.equals(this._position, position)) {
+      this._position = position;
+      return true;
+    }
+
+    return false;
+  }
+
+  private _updateZoom(factor: number, origin = vec3.zero()): void {
+    let zoom = this._zoom * factor;
+
+    if (zoom > EditorService._MAX_ZOOM) zoom = EditorService._MAX_ZOOM;
+    else if (zoom < this._minZoom) zoom = this._minZoom;
+
+    if (zoom !== this._zoom) {
+      const source = this._project(origin);
+      this._zoom = zoom;
+      this._fitted = this._zoom === this._minZoom;
+
+      this._translatePosition(vec3.sub(source, this._project(origin)));
+      this._updateView();
+    }
   }
 
   private _updateView(): void {
@@ -63,6 +117,8 @@ export class EditorService {
       false,
       view,
     );
+
+    this._draw();
   }
 
   private _draw(): void {
@@ -172,6 +228,7 @@ export class EditorService {
     const maxRatio = ratioW > ratioH ? ratioW : ratioH;
 
     this._ratio = vec3.new(ratioW, ratioH, 0);
+    this._canvasSize = vec3.new(width, height, 0);
     this._minZoom = maxRatio <= 1 ? 1 : 1 / maxRatio;
 
     if (this._zoom < this._minZoom) this._zoom = this._minZoom;
@@ -179,62 +236,32 @@ export class EditorService {
 
     gl.viewport(0, 0, width, height);
     this._updateView();
-    this._draw();
   }
 
   public translate(movement: vec3): void {
-    this._position = vec3.add(
-      this._position,
-      vec3.div(
-        vec3.scale(movement, (2 * devicePixelRatio) / this._zoom),
-        this._imageSize,
-      ),
-    );
-
-    this._updateView();
-    this._draw();
+    if (this._translatePosition(this._project(movement))) this._updateView();
   }
 
-  public zoomIn(): void {
-    if (!this.canZoomIn) return;
-
-    this._zoom *= EditorService._ZOOM_FACTOR;
-    this._fitted = false;
-    if (this._zoom > EditorService._MAX_ZOOM) {
-      this._zoom = EditorService._MAX_ZOOM;
+  public zoomIn(origin?: vec3): void {
+    if (this.canZoomIn) {
+      this._updateZoom(EditorService._ZOOM_FACTOR, origin);
     }
-
-    this._updateView();
-    this._draw();
   }
 
-  public zoomOut(): void {
-    if (!this.canZoomOut) return;
-
-    this._zoom /= EditorService._ZOOM_FACTOR;
-    if (this._zoom < this._minZoom) {
-      this._zoom = this._minZoom;
-      this._fitted = true;
-    } else {
-      this._fitted = false;
+  public zoomOut(origin?: vec3): void {
+    if (this.canZoomOut) {
+      this._updateZoom(1 / EditorService._ZOOM_FACTOR, origin);
     }
-
-    this._updateView();
-    this._draw();
   }
 
   public fit(): void {
-    this._zoom = this._minZoom;
-    this._fitted = true;
-    this._updateView();
-    this._draw();
+    if (this._zoom !== this._minZoom) {
+      this._updateZoom(this._minZoom / this._zoom);
+    }
   }
 
   public realSize(): void {
-    this._zoom = 1;
-    this._fitted = false;
-    this._updateView();
-    this._draw();
+    if (this._zoom !== 1) this._updateZoom(1 / this._zoom);
   }
 
   public closeImage(): void {

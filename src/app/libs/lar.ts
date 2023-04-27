@@ -36,11 +36,31 @@ export const vec3 = {
     ]) as unknown as vec3;
   },
 
+  sub: (a: Readonly<vec3>, b: Readonly<vec3>): vec3 => {
+    return new Float32Array([
+      a[0] - b[0],
+      a[1] - b[1],
+      a[2] - b[2],
+    ]) as unknown as vec3;
+  },
+
   div: (a: Readonly<vec3>, b: Readonly<vec3>): vec3 => {
     return new Float32Array([
       a[0] / b[0],
       a[1] / b[1],
       a[2] / b[2],
+    ]) as unknown as vec3;
+  },
+
+  equals: (a: Readonly<vec3>, b: Readonly<vec3>): boolean => {
+    return a[0] === b[0] && a[1] === b[1] && a[2] === b[2];
+  },
+
+  abs: (a: Readonly<vec3>): vec3 => {
+    return new Float32Array([
+      Math.abs(a[0]),
+      Math.abs(a[1]),
+      Math.abs(a[2]),
     ]) as unknown as vec3;
   },
 

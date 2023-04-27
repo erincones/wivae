@@ -95,7 +95,14 @@ export class CanvasComponent implements AfterViewInit {
 
   public handleWheel(e: WheelEvent): void {
     this.dumb(e);
-    if (e.deltaY < 0) this._editor.zoomIn();
-    if (e.deltaY > 0) this._editor.zoomOut();
+    const dim = this._canvas.nativeElement.getBoundingClientRect();
+    const target = vec3.new(
+      dim.left + dim.width / 2 - e.x,
+      e.y - dim.top - dim.height / 2,
+      0,
+    );
+
+    if (e.deltaY < 0) this._editor.zoomIn(target);
+    if (e.deltaY > 0) this._editor.zoomOut(target);
   }
 }

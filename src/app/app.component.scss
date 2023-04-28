@@ -26,6 +26,19 @@
 
     .main {
       @apply flex-grow;
+      @apply bg-slate-50;
+
+      .loading {
+        @apply h-full w-full;
+        @apply flex;
+        @apply items-center justify-center;
+
+        .spinner {
+          @apply flex;
+          @apply text-4xl text-slate-500;
+          @apply animate-spin;
+        }
+      }
 
       .message {
         @apply h-full w-full;

@@ -10,4 +10,7 @@ export enum ViewerStatus {
 
   /** Open viewer */
   OPEN = 0x12,
+
+  /** Loading image */
+  LOADING = 0x14,
 }

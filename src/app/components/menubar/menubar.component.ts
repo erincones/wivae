@@ -75,9 +75,9 @@ export class MenubarComponent {
     return this.core.status !== ViewerStatus.OPEN || null;
   }
 
-  public handleFile(e?: DragEvent): void {
+  public handleFile(): void {
     this.core
-      .uploadFile(e)
+      .uploadFile()
       .then(() => {
         this._alerts.clear();
       })

@@ -9,16 +9,24 @@ import { GLSLProgram } from '../classes/glslprogram';
   providedIn: 'root',
 })
 export class EditorService {
-  private static readonly _SQUARE = new Float32Array([
-    -1.0, 1.0, 0.0, 1.0, -1.0, -1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
-    1.0, 0.0,
+  private static readonly _CONTEXT_ATTRIBUTES: WebGLContextAttributes = {
+    alpha: false,
+    depth: false,
+    stencil: false,
+    antialias: true,
+    preserveDrawingBuffer: true,
+  };
+
+  private static readonly _SQUARE: Float32Array = new Float32Array([
+    -1.0, 1.0, 0.0, 0.0, -1.0, -1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, -1.0,
+    1.0, 1.0,
   ]);
 
-  private static readonly _INDEXES = new Int8Array([0, 1, 2, 3]);
+  private static readonly _INDEXES: Int8Array = new Int8Array([0, 1, 2, 3]);
 
-  private static readonly _ZOOM_FACTOR = 1.1;
+  private static readonly _ZOOM_FACTOR: number = 1.1;
 
-  private static readonly _MAX_ZOOM = 50;
+  private static readonly _MAX_ZOOM: number = 50;
 
   private _gl: WebGL2RenderingContext | null;
 
@@ -172,13 +180,17 @@ export class EditorService {
   }
 
   public setup(canvas: HTMLCanvasElement): void {
-    this._gl = canvas.getContext('webgl2');
+    this._gl = canvas.getContext('webgl2', EditorService._CONTEXT_ATTRIBUTES);
     const gl = this.gl;
     const image = this._core.image;
 
-    this._fitted = true;
+    this._canvasSize = vec3.zero();
     this._imageSize = vec3.new(image.width, image.height, 1);
     this._position = vec3.zero();
+    this._ratio = vec3.zero();
+    this._zoom = 1;
+    this._minZoom = 1;
+    this._fitted = true;
 
     this._viewerProgram.link(gl);
     this._viewerProgram.use(gl);
@@ -209,17 +221,22 @@ export class EditorService {
     gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 16, 8);
 
     const texture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.uniform1i(this._viewerProgram.getUniformLocation(gl, 'u_img'), 0);
   }
 
   public resizeViewport(width: number, height: number): void {
+    const canvasSize = vec3.new(width, height, 0);
+    if (vec3.equals(this._canvasSize, canvasSize)) return;
+
     const gl = this.gl;
     const image = this._core.image;
 
@@ -228,7 +245,7 @@ export class EditorService {
     const maxRatio = ratioW > ratioH ? ratioW : ratioH;
 
     this._ratio = vec3.new(ratioW, ratioH, 0);
-    this._canvasSize = vec3.new(width, height, 0);
+    this._canvasSize = canvasSize;
     this._minZoom = maxRatio <= 1 ? 1 : 1 / maxRatio;
 
     if (this._zoom < this._minZoom) this._zoom = this._minZoom;
@@ -265,8 +282,10 @@ export class EditorService {
   }
 
   public closeImage(): void {
-    this._viewerProgram.delete(this.gl);
-    this._gl = null;
     this._core.closeFile();
+    if (this._gl !== null) {
+      this._viewerProgram.delete(this._gl);
+      this._gl = null;
+    }
   }
 }

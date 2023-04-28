@@ -4,6 +4,8 @@ import {
   Component,
   ElementRef,
   HostListener,
+  OnDestroy,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { AlertType } from 'src/app/enums/alert-type';
@@ -16,9 +18,11 @@ import { EditorService } from 'src/app/services/editor.service';
   templateUrl: './canvas.component.html',
   styleUrls: ['./canvas.component.scss'],
 })
-export class CanvasComponent implements AfterViewInit {
+export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('canvas')
   private _canvas!: ElementRef<HTMLCanvasElement>;
+
+  private _observer: ResizeObserver;
 
   private _moving: boolean;
 
@@ -28,6 +32,7 @@ export class CanvasComponent implements AfterViewInit {
     private _alerts: AlertsService,
     private _editor: EditorService,
   ) {
+    this._observer = new ResizeObserver(this._resizeViewport.bind(this));
     this._moving = false;
   }
 
@@ -36,14 +41,11 @@ export class CanvasComponent implements AfterViewInit {
     const host = this._host.nativeElement;
     const canvas = this._canvas.nativeElement;
 
-    canvas.style.width = `${0}px`;
-    canvas.style.height = `${0}px`;
-    canvas.width = 0;
-    canvas.height = 0;
-
+    canvas.hidden = true;
     const width = host.offsetWidth;
     const height = host.offsetHeight;
 
+    canvas.hidden = false;
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     canvas.width = width * devicePixelRatio;
@@ -70,6 +72,10 @@ export class CanvasComponent implements AfterViewInit {
     return this._moving;
   }
 
+  public ngOnInit(): void {
+    this._observer.observe(this._host.nativeElement);
+  }
+
   public ngAfterViewInit(): void {
     try {
       this._editor.setup(this._canvas.nativeElement);
@@ -83,6 +89,11 @@ export class CanvasComponent implements AfterViewInit {
     }
   }
 
+  public ngOnDestroy(): void {
+    this._observer.unobserve(this._host.nativeElement);
+    this._editor.closeImage();
+  }
+
   public dumb(e: Event): void {
     e.preventDefault();
     e.stopPropagation();
@@ -94,7 +105,6 @@ export class CanvasComponent implements AfterViewInit {
   }
 
   public handleWheel(e: WheelEvent): void {
-    this.dumb(e);
     const dim = this._canvas.nativeElement.getBoundingClientRect();
     const target = vec3.new(
       dim.left + dim.width / 2 - e.x,

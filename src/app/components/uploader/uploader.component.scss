@@ -23,6 +23,7 @@
 
 .loader.dragging {
   @apply text-slate-300;
+  @apply cursor-copy;
 
   .content {
     @apply border-slate-300;

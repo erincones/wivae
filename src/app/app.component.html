@@ -11,6 +11,9 @@
     <main class="main" [ngSwitch]="core.status">
       <div *ngSwitchCase="ViewerStatus.EMPTY" wivae-uploader></div>
       <div *ngSwitchCase="ViewerStatus.OPEN" wivae-canvas></div>
+      <div *ngSwitchCase="ViewerStatus.LOADING" class="loading">
+        <fa-icon [icon]="faCircleNotch" class="spinner"></fa-icon>
+      </div>
       <div *ngSwitchCase="ViewerStatus.UNSUPPORTED" class="message">
         <pre> ______________________________
 / Your system does not support \

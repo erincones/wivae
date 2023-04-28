@@ -9,11 +9,14 @@ export class CoreService {
 
   private _image?: HTMLImageElement;
 
+  private _loading: boolean;
+
   private _showToolbar: boolean;
 
   private _showInfobar: boolean;
 
   public constructor() {
+    this._loading = false;
     this._showToolbar = true;
     this._showInfobar = true;
   }
@@ -30,6 +33,7 @@ export class CoreService {
 
   public get status(): ViewerStatus {
     if (!this.supported) return ViewerStatus.UNSUPPORTED;
+    if (this._loading) return ViewerStatus.LOADING;
     return this._image === undefined ? ViewerStatus.EMPTY : ViewerStatus.OPEN;
   }
 
@@ -77,13 +81,17 @@ export class CoreService {
       } else if (!file.type.startsWith('image/')) {
         reject(`Not valid format\nFile name: ${file.name}`);
       } else {
-        if (this._image !== undefined) URL.revokeObjectURL(this._image.src);
+        this._loading = true;
+        if (this._image !== undefined) this.closeFile();
+
         const image = new Image();
         image.onerror = () => {
+          this._loading = false;
           reject(`Unknown error\nFile name: ${file.name}`);
         };
         image.onload = () => {
           this._image = image;
+          this._loading = false;
           resolve();
         };
         image.src = URL.createObjectURL(file);

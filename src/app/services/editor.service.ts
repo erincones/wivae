@@ -281,6 +281,39 @@ export class EditorService {
     if (this._zoom !== 1) this._updateZoom(1 / this._zoom);
   }
 
+  public saveImage(): void {
+    const gl = this.gl;
+    const canvas = gl.canvas as HTMLCanvasElement;
+    const canvasSize = this._canvasSize;
+    const position = this._position;
+    const zoom = this._zoom;
+
+    canvas.width = this._imageSize[0];
+    canvas.height = this._imageSize[1];
+    this._position = vec3.zero();
+    this._zoom = 1;
+    this.resizeViewport(canvas.width, canvas.height);
+
+    canvas.toBlob((blob) => {
+      if (blob === null) return;
+
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+
+      a.href = url;
+      a.download = `WIVAE-${Date.now()}`;
+      a.click();
+
+      URL.revokeObjectURL(url);
+    });
+
+    canvas.width = canvasSize[0];
+    canvas.height = canvasSize[1];
+    this._position = position;
+    this._zoom = zoom;
+    this.resizeViewport(canvasSize[0], canvasSize[1]);
+  }
+
   public closeImage(): void {
     this._core.closeFile();
     if (this._gl !== null) {

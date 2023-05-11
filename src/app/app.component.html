@@ -5,12 +5,12 @@
 </header>
 
 <div class="content">
-  <aside *ngIf="core.showToolbar" wivae-toolbar></aside>
+  <wivae-toolbar *ngIf="core.showToolbar"></wivae-toolbar>
   <section class="viewer">
-    <header wivae-menubar></header>
+    <wivae-menubar></wivae-menubar>
     <main class="main" [ngSwitch]="core.status">
-      <div *ngSwitchCase="ViewerStatus.EMPTY" wivae-uploader></div>
-      <div *ngSwitchCase="ViewerStatus.OPEN" wivae-canvas></div>
+      <wivae-uploader *ngSwitchCase="ViewerStatus.EMPTY"></wivae-uploader>
+      <wivae-canvas *ngSwitchCase="ViewerStatus.OPEN"></wivae-canvas>
       <div *ngSwitchCase="ViewerStatus.LOADING" class="loading">
         <fa-icon [icon]="faCircleNotch" class="spinner"></fa-icon>
       </div>
@@ -41,7 +41,7 @@
         >
       </div>
     </main>
-    <footer wivae-statusbar></footer>
+    <wivae-statusbar></wivae-statusbar>
   </section>
-  <aside *ngIf="core.showInfobar" wivae-infobar></aside>
+  <wivae-infobar *ngIf="core.showInfobar"></wivae-infobar>
 </div>

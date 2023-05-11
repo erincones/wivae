@@ -6,7 +6,7 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-  selector: '[wivae-root]',
+  selector: 'wivae-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

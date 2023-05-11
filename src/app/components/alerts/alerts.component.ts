@@ -3,7 +3,7 @@ import { AlertType } from 'src/app/enums/alert-type';
 import { AlertsService } from 'src/app/services/alerts.service';
 
 @Component({
-  selector: '[wivae-alerts]',
+  selector: 'wivae-alerts',
   templateUrl: './alerts.component.html',
   styleUrls: ['./alerts.component.scss'],
 })

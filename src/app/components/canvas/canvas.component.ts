@@ -14,7 +14,7 @@ import { AlertsService } from 'src/app/services/alerts.service';
 import { EditorService } from 'src/app/services/editor.service';
 
 @Component({
-  selector: '[wivae-canvas]',
+  selector: 'wivae-canvas',
   templateUrl: './canvas.component.html',
   styleUrls: ['./canvas.component.scss'],
 })

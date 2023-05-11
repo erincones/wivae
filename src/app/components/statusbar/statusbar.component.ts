@@ -10,7 +10,7 @@ import { CoreService } from 'src/app/services/core.service';
 import { EditorService } from 'src/app/services/editor.service';
 
 @Component({
-  selector: '[wivae-statusbar]',
+  selector: 'wivae-statusbar',
   templateUrl: './statusbar.component.html',
   styleUrls: ['./statusbar.component.scss'],
 })

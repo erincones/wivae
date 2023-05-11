@@ -4,7 +4,7 @@ import { CoreService } from 'src/app/services/core.service';
 import { AlertsService } from 'src/app/services/alerts.service';
 
 @Component({
-  selector: '[wivae-uploader]',
+  selector: 'wivae-uploader',
   templateUrl: './uploader.component.html',
   styleUrls: ['./uploader.component.scss'],
 })

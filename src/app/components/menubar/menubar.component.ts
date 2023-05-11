@@ -23,7 +23,7 @@ import { CoreService } from 'src/app/services/core.service';
 import { EditorService } from 'src/app/services/editor.service';
 
 @Component({
-  selector: '[wivae-menubar]',
+  selector: 'wivae-menubar',
   templateUrl: './menubar.component.html',
   styleUrls: ['./menubar.component.scss'],
 })

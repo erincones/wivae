@@ -7,7 +7,7 @@
   (drop)="handleFile($event)"
   (click)="handleFile()"
   class="flex h-full w-full flex-col items-center justify-center bg-slate-50"
-  [ngClass]="dragging ? 'cursor-copy text-slate-300' : ''"
+  [ngClass]="{ 'cursor-copy text-slate-300': dragging }"
 >
   <div
     class="border-2 border-dashed bg-white px-12 py-6"

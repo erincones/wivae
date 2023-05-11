@@ -14,7 +14,7 @@ export class GLSLProgram {
   private _compileShader(
     gl: WebGL2RenderingContext,
     type: WebGL2RenderingContext['VERTEX_SHADER' | 'FRAGMENT_SHADER'],
-    src: string,
+    src: string
   ): WebGLShader {
     const stage = type === gl.VERTEX_SHADER ? 'vertex' : 'fragment';
     const shader = gl.createShader(type);
@@ -46,7 +46,7 @@ export class GLSLProgram {
     const fragShader = this._compileShader(
       gl,
       gl.FRAGMENT_SHADER,
-      this._fragSrc,
+      this._fragSrc
     );
 
     gl.attachShader(this._id, vertShader);
@@ -71,7 +71,7 @@ export class GLSLProgram {
 
   public getUniformLocation(
     gl: WebGL2RenderingContext,
-    name: string,
+    name: string
   ): WebGLUniformLocation | null {
     if (this._id === null) throw new Error('Not valid GLSL program');
     return gl.getUniformLocation(this._id, name);

@@ -64,7 +64,7 @@ export class EditorService {
   private _project(point: vec3): vec3 {
     return vec3.div(
       vec3.scale(point, (2 * devicePixelRatio) / this._zoom),
-      this._imageSize,
+      this._imageSize
     );
   }
 
@@ -72,9 +72,9 @@ export class EditorService {
     const offset = vec3.div(
       vec3.scale(
         vec3.sub(vec3.scale(this._imageSize, this._zoom), this._canvasSize),
-        1 / this._zoom,
+        1 / this._zoom
       ),
-      this._imageSize,
+      this._imageSize
     );
 
     const position = vec3.add(this._position, translation);
@@ -117,13 +117,13 @@ export class EditorService {
 
     const view = mat4.translate(
       mat4.scale(mat4.new(1), vec3.scale(this._ratio, this._zoom)),
-      this._position,
+      this._position
     );
 
     gl.uniformMatrix4fv(
       this._viewerProgram.getUniformLocation(gl, 'u_view'),
       false,
-      view,
+      view
     );
 
     this._draw();
@@ -211,7 +211,7 @@ export class EditorService {
     gl.bufferData(
       gl.ELEMENT_ARRAY_BUFFER,
       EditorService._INDEXES,
-      gl.STATIC_DRAW,
+      gl.STATIC_DRAW
     );
 
     gl.enableVertexAttribArray(0);

@@ -46,7 +46,7 @@ export class MenubarComponent {
   public constructor(
     private _alerts: AlertsService,
     public core: CoreService,
-    public editor: EditorService,
+    public editor: EditorService
   ) {
     this.fa1 = fa1;
     this.faCircle = faCircle;

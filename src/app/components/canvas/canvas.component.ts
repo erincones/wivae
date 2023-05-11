@@ -30,7 +30,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     private _cd: ChangeDetectorRef,
     private _host: ElementRef<HTMLDivElement>,
     private _alerts: AlertsService,
-    private _editor: EditorService,
+    private _editor: EditorService
   ) {
     this._observer = new ResizeObserver(this._resizeViewport.bind(this));
     this._moving = false;
@@ -83,7 +83,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     } catch (e) {
       this._alerts.push(
         AlertType.ERROR,
-        e instanceof Error ? e.message : String(e),
+        e instanceof Error ? e.message : String(e)
       );
       this._cd.detectChanges();
     }
@@ -109,7 +109,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     const target = vec3.new(
       dim.left + dim.width / 2 - e.x,
       e.y - dim.top - dim.height / 2,
-      0,
+      0
     );
 
     if (e.deltaY < 0) this._editor.zoomIn(target);

@@ -2,23 +2,25 @@
   type="button"
   [title]="'Show toolbar'"
   (click)="core.toggleToolbar()"
-  class="button"
+  class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faPenRuler"></fa-icon>
   <fa-icon [icon]="core.showToolbar ? faCaretLeft : faCaretRight"></fa-icon>
 </button>
 
-<span class="separator"></span>
+<span class="mx-2 border-l border-slate-400"></span>
 
-<span *ngFor="let field of editor.status" class="field">{{ field }}</span>
+<span *ngFor="let field of editor.status" class="mr-4 leading-none">{{
+  field
+}}</span>
 
-<span class="spawn"></span>
+<span class="flex-grow"></span>
 
 <button
   type="button"
   [title]="'Show information'"
   (click)="core.toggleInfobar()"
-  class="button"
+  class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="core.showInfobar ? faCaretRight : faCaretLeft"></fa-icon>
   <fa-icon [icon]="faInfo"></fa-icon>

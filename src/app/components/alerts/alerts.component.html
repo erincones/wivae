@@ -1,11 +1,12 @@
 <div
   *ngFor="let alert of alerts.alerts.slice(-3); index as i"
-  [ngClass]="['alert', className(alert.type)]"
+  class="m-1 border px-4 py-2"
+  [ngClass]="className(alert.type)"
 >
   <button
     type="button"
     title="Close"
-    class="close"
+    class="absolute right-0 mr-4 px-1 font-extrabold"
     (click)="handleClick(alert.id)"
   >
     <span>&times;</span>

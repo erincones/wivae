@@ -25,7 +25,6 @@ import { EditorService } from 'src/app/services/editor.service';
 @Component({
   selector: 'wivae-menubar',
   templateUrl: './menubar.component.html',
-  styleUrls: ['./menubar.component.scss'],
 })
 export class MenubarComponent {
   public readonly fa1: IconDefinition;

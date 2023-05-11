@@ -1,26 +1,43 @@
-<header class="header">
-  <h1 class="title">
+<header class="bg-slate-600 px-2 py-1 text-center text-slate-100">
+  <h1 class="text-xl font-bold">
     <b>W</b>eb <b>I</b>mage <b>V</b>iewer <b>A</b>nd <b>E</b>ditor
   </h1>
 </header>
 
-<div class="content">
-  <wivae-toolbar *ngIf="core.showToolbar"></wivae-toolbar>
-  <section class="viewer">
-    <wivae-menubar></wivae-menubar>
-    <main class="main" [ngSwitch]="core.status">
+<div class="flex h-full w-full flex-grow flex-col overflow-hidden md:flex-row">
+  <wivae-toolbar
+    *ngIf="core.showToolbar"
+    class="h-1/3 overflow-auto border-b-8 border-slate-600 bg-slate-100 text-slate-800 md:h-auto md:w-80 md:border-b-0 md:border-r-8"
+  ></wivae-toolbar>
+  <section class="flex flex-grow flex-col overflow-hidden">
+    <wivae-menubar
+      class="flex border-b border-slate-400 bg-slate-300 px-2 py-1 text-slate-800"
+    ></wivae-menubar>
+    <main class="flex-grow bg-slate-50" [ngSwitch]="core.status">
       <wivae-uploader *ngSwitchCase="ViewerStatus.EMPTY"></wivae-uploader>
-      <wivae-canvas *ngSwitchCase="ViewerStatus.OPEN"></wivae-canvas>
-      <div *ngSwitchCase="ViewerStatus.LOADING" class="loading">
-        <fa-icon [icon]="faCircleNotch" class="spinner"></fa-icon>
+      <wivae-canvas
+        *ngSwitchCase="ViewerStatus.OPEN"
+        class="relative block h-full w-full"
+      ></wivae-canvas>
+      <div
+        *ngSwitchCase="ViewerStatus.LOADING"
+        class="flex h-full w-full items-center justify-center"
+      >
+        <fa-icon
+          [icon]="faCircleNotch"
+          class="flex animate-spin text-4xl text-slate-500"
+        ></fa-icon>
       </div>
-      <div *ngSwitchCase="ViewerStatus.UNSUPPORTED" class="message">
+      <div
+        *ngSwitchCase="ViewerStatus.UNSUPPORTED"
+        class="flex h-full w-full items-center justify-center leading-tight"
+      >
         <pre> ______________________________
 / Your system does not support \
-| <a title="Support details" href="https://caniuse.com/mdn-api_canvasrenderingcontext2d" target="_blank" rel="noopener noreferrer" class="link">WebGL2</a>.                      |
+| <a title="Support details" href="https://caniuse.com/mdn-api_canvasrenderingcontext2d" target="_blank" rel="noopener noreferrer" class="font-bold text-sky-900 underline">WebGL2</a>.                      |
 |                              |
 | If you think this a mistake, |
-\ <a href="https://github.com/erincones/wivae/issues/new" target="_blank" rel="noopener noreferrer" class="link">create an new issue</a>.         /
+\ <a href="https://github.com/erincones/wivae/issues/new" target="_blank" rel="noopener noreferrer" class="font-bold text-sky-900 underline">create an new issue</a>.         /
  ------------------------------
         \   ^__^
          \  (@@)\_______
@@ -28,7 +45,10 @@
                 ||----w |
                 ||     ||</pre>
       </div>
-      <div *ngSwitchDefault class="message">
+      <div
+        *ngSwitchDefault
+        class="flex h-full w-full items-center justify-center leading-tight"
+      >
         <pre>
  _______________
 < Unknown error >
@@ -41,7 +61,12 @@
         >
       </div>
     </main>
-    <wivae-statusbar></wivae-statusbar>
+    <wivae-statusbar
+      class="flex border-t border-slate-400 bg-slate-300 px-2 py-1 text-slate-800"
+    ></wivae-statusbar>
   </section>
-  <wivae-infobar *ngIf="core.showInfobar"></wivae-infobar>
+  <wivae-infobar
+    *ngIf="core.showInfobar"
+    class="h-1/3 overflow-auto border-t-8 border-slate-600 bg-slate-100 text-slate-800 md:h-auto md:w-80 md:border-l-8 md:border-t-0"
+  ></wivae-infobar>
 </div>

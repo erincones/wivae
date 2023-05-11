@@ -1,8 +1,8 @@
-<wivae-alerts></wivae-alerts>
+<wivae-alerts class="absolute w-full"></wivae-alerts>
 <canvas
   #canvas
-  class="canvas"
-  [class.grabbing]="moving"
+  class="cursor-grab"
+  [class.cursor-grabbing]="moving"
   (mousedown)="handleMouseDown($event)"
   (contextmenu)="dumb($event)"
   (wheel)="handleWheel($event)"

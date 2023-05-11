@@ -12,7 +12,6 @@ import { EditorService } from 'src/app/services/editor.service';
 @Component({
   selector: 'wivae-statusbar',
   templateUrl: './statusbar.component.html',
-  styleUrls: ['./statusbar.component.scss'],
 })
 export class StatusbarComponent {
   public readonly faCaretLeft: IconDefinition;

@@ -42,6 +42,9 @@ export class UploaderComponent {
       })
       .catch((e: string) => {
         this._alerts.push(AlertType.ERROR, `Cannot open the given file: ${e}`);
+      })
+      .finally(() => {
+        this._dragging = false;
       });
   }
 }

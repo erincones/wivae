@@ -8,7 +8,6 @@ import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'wivae-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   public readonly ViewerStatus = ViewerStatus;

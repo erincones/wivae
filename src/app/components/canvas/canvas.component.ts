@@ -16,7 +16,6 @@ import { EditorService } from 'src/app/services/editor.service';
 @Component({
   selector: 'wivae-canvas',
   templateUrl: './canvas.component.html',
-  styleUrls: ['./canvas.component.scss'],
 })
 export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('canvas')

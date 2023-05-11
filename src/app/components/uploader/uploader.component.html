@@ -6,12 +6,15 @@
   (dragleave)="handleDragLeave($event)"
   (drop)="handleFile($event)"
   (click)="handleFile()"
-  class="loader"
-  [class.dragging]="dragging"
+  class="flex h-full w-full flex-col items-center justify-center bg-slate-50"
+  [ngClass]="dragging ? 'cursor-copy text-slate-300' : ''"
 >
-  <div class="content">
+  <div
+    class="border-2 border-dashed bg-white px-12 py-6"
+    [ngClass]="dragging ? 'border-slate-300' : 'border-slate-500'"
+  >
     <p>Drop image here</p>
-    <p class="muted">- or -</p>
+    <p [ngClass]="dragging ? 'text-slate-200' : 'text-slate-400'">- or -</p>
     <p>Click to upload</p>
   </div>
 </button>

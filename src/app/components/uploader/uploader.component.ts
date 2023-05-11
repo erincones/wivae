@@ -6,7 +6,6 @@ import { AlertsService } from 'src/app/services/alerts.service';
 @Component({
   selector: 'wivae-uploader',
   templateUrl: './uploader.component.html',
-  styleUrls: ['./uploader.component.scss'],
 })
 export class UploaderComponent {
   private _dragging: boolean;

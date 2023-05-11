@@ -14,7 +14,10 @@
       class="flex border-b border-slate-400 bg-slate-300 px-2 py-1 text-slate-800"
     ></wivae-menubar>
     <main class="flex-grow bg-slate-50" [ngSwitch]="core.status">
-      <wivae-uploader *ngSwitchCase="ViewerStatus.EMPTY"></wivae-uploader>
+      <wivae-uploader
+        *ngSwitchCase="ViewerStatus.EMPTY"
+        class="relative h-full w-full text-slate-500"
+      ></wivae-uploader>
       <wivae-canvas
         *ngSwitchCase="ViewerStatus.OPEN"
         class="relative block h-full w-full"

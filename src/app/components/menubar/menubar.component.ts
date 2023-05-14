@@ -16,11 +16,11 @@ import {
   faTrash,
   faUpload,
 } from '@fortawesome/free-solid-svg-icons';
+import { Alert } from 'src/app/classes/alert';
 import { AlertType } from 'src/app/enums/alert-type';
 import { ViewerStatus } from 'src/app/enums/viewer-status';
-import { AlertsService } from 'src/app/services/alerts.service';
-import { CoreService } from 'src/app/services/core.service';
 import { EditorService } from 'src/app/services/editor.service';
+import { GUIService } from 'src/app/services/gui.service';
 
 @Component({
   selector: 'wivae-menubar',
@@ -42,11 +42,7 @@ export class MenubarComponent {
   public readonly faSquare: IconDefinition;
   public readonly faTrash: IconDefinition;
 
-  public constructor(
-    private _alerts: AlertsService,
-    public core: CoreService,
-    public editor: EditorService
-  ) {
+  public constructor(private _gui: GUIService, public editor: EditorService) {
     this.fa1 = fa1;
     this.faCircle = faCircle;
     this.faDownload = faDownload;
@@ -65,23 +61,25 @@ export class MenubarComponent {
 
   public get unusable(): boolean {
     return (
-      this.core.status === ViewerStatus.UNSUPPORTED ||
-      this.core.status === ViewerStatus.ERROR
+      this.editor.status === ViewerStatus.UNSUPPORTED ||
+      this.editor.status === ViewerStatus.ERROR
     );
   }
 
   public get notOpen(): true | null {
-    return this.core.status !== ViewerStatus.OPEN || null;
+    return this.editor.status !== ViewerStatus.OPEN || null;
   }
 
   public handleFile(): void {
-    this.core
+    this.editor
       .uploadFile()
       .then(() => {
-        this._alerts.clear();
+        this._gui.clearAlerts();
       })
       .catch((e: string) => {
-        this._alerts.push(AlertType.ERROR, `Cannot open the given file: ${e}`);
+        this._gui.pushAlert(
+          new Alert(AlertType.ERROR, `Cannot open the given file: ${e}`)
+        );
       });
   }
 }

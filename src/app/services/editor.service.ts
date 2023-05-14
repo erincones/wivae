@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import baseVert from '../shaders/viewer.vert';
 import baseFrag from '../shaders/viewer.frag';
-import { CoreService } from './core.service';
 import { mat4, vec3 } from '../libs/lar';
 import { GLSLProgram } from '../classes/glslprogram';
+import { ViewerStatus } from '../enums/viewer-status';
 
 @Injectable({
   providedIn: 'root',
@@ -28,9 +28,17 @@ export class EditorService {
 
   private static readonly _MAX_ZOOM: number = 50;
 
+  private _supported?: boolean;
+
+  private _file?: File;
+
+  private _image?: HTMLImageElement;
+
+  private _loading: boolean;
+
   private _gl: WebGL2RenderingContext | null;
 
-  private _viewerProgram: GLSLProgram;
+  private _program: Record<'viewer', GLSLProgram>;
 
   private _bg: vec3;
 
@@ -48,9 +56,10 @@ export class EditorService {
 
   private _fitted: boolean;
 
-  public constructor(private _core: CoreService) {
+  public constructor() {
+    this._loading = false;
     this._gl = null;
-    this._viewerProgram = new GLSLProgram(baseVert, baseFrag);
+    this._program = { viewer: new GLSLProgram(baseVert, baseFrag) };
     this._bg = vec3.new(248, 250, 252);
     this._canvasSize = vec3.zero();
     this._imageSize = vec3.zero();
@@ -59,6 +68,32 @@ export class EditorService {
     this._zoom = 1;
     this._minZoom = 1;
     this._fitted = true;
+  }
+
+  private async _openFile(file?: File): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (!(file instanceof File)) {
+        reject('Not valid file.');
+      } else if (!file.type.startsWith('image/')) {
+        reject(`Not valid format\nFile name: ${file.name}`);
+      } else {
+        this._loading = true;
+        if (this._image !== undefined) this.closeFile();
+
+        const image = new Image();
+        image.onerror = () => {
+          this._loading = false;
+          reject(`Unknown error\nFile name: ${file.name}`);
+        };
+        image.onload = () => {
+          this._file = file;
+          this._image = image;
+          this._loading = false;
+          resolve();
+        };
+        image.src = URL.createObjectURL(file);
+      }
+    });
   }
 
   private _project(point: vec3): vec3 {
@@ -121,7 +156,7 @@ export class EditorService {
     );
 
     gl.uniformMatrix4fv(
-      this._viewerProgram.getUniformLocation(gl, 'u_view'),
+      this._program.viewer.getUniformLocation(gl, 'u_view'),
       false,
       view
     );
@@ -136,9 +171,32 @@ export class EditorService {
     gl.drawElements(gl.TRIANGLE_STRIP, 4, this.gl.UNSIGNED_BYTE, 0);
   }
 
+  public get supported(): boolean {
+    if (this._supported === undefined) {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('webgl2');
+      this._supported = context !== null;
+    }
+
+    return this._supported;
+  }
+
+  public get file(): File {
+    if (!(this._file instanceof File)) throw new Error('Not image file set.');
+
+    return this._file;
+  }
+
+  public get image(): HTMLImageElement {
+    if (!(this._image instanceof HTMLImageElement))
+      throw new Error('Not image set.');
+
+    return this._image;
+  }
+
   public get gl(): WebGL2RenderingContext {
     try {
-      this._core.image;
+      this.image;
     } catch (e) {
       this._gl = null;
       throw e;
@@ -148,6 +206,16 @@ export class EditorService {
       throw new Error('Could not get the WebGL2 rendering context.');
 
     return this._gl;
+  }
+
+  public get bg(): vec3 {
+    return this._bg;
+  }
+
+  public set bg(bg: vec3) {
+    this._bg = vec3.new(...bg);
+    this.gl.clearColor(...vec3.scale(this._bg, 1 / 255), 1);
+    this._draw();
   }
 
   public get zoom(): number {
@@ -170,7 +238,13 @@ export class EditorService {
     return this._zoom === 1;
   }
 
-  public get status(): ReadonlyArray<string> {
+  public get status(): ViewerStatus {
+    if (!this.supported) return ViewerStatus.UNSUPPORTED;
+    if (this._loading) return ViewerStatus.LOADING;
+    return this._image === undefined ? ViewerStatus.EMPTY : ViewerStatus.OPEN;
+  }
+
+  public get summary(): ReadonlyArray<string> {
     try {
       this.gl;
       return [`Changes: ${0}`, `Zoom: ${(this._zoom * 100).toFixed(2)}%`];
@@ -182,7 +256,7 @@ export class EditorService {
   public setup(canvas: HTMLCanvasElement): void {
     this._gl = canvas.getContext('webgl2', EditorService._CONTEXT_ATTRIBUTES);
     const gl = this.gl;
-    const image = this._core.image;
+    const image = this.image;
 
     this._canvasSize = vec3.zero();
     this._imageSize = vec3.new(image.width, image.height, 1);
@@ -192,8 +266,8 @@ export class EditorService {
     this._minZoom = 1;
     this._fitted = true;
 
-    this._viewerProgram.link(gl);
-    this._viewerProgram.use(gl);
+    this._program.viewer.link(gl);
+    this._program.viewer.use(gl);
 
     gl.clearColor(...vec3.scale(this._bg, 1 / 255), 1);
     gl.enable(gl.BLEND);
@@ -237,7 +311,7 @@ export class EditorService {
       gl.LINEAR_MIPMAP_LINEAR
     );
 
-    gl.uniform1i(this._viewerProgram.getUniformLocation(gl, 'u_img'), 0);
+    gl.uniform1i(this._program.viewer.getUniformLocation(gl, 'u_img'), 0);
   }
 
   public resizeViewport(width: number, height: number): void {
@@ -245,7 +319,7 @@ export class EditorService {
     if (vec3.equals(this._canvasSize, canvasSize)) return;
 
     const gl = this.gl;
-    const image = this._core.image;
+    const image = this.image;
 
     const ratioW = image.width / width;
     const ratioH = image.height / height;
@@ -288,6 +362,28 @@ export class EditorService {
     if (this._zoom !== 1) this._updateZoom(1 / this._zoom);
   }
 
+  public async uploadFile(e?: DragEvent): Promise<void> {
+    if (e instanceof DragEvent) {
+      e.preventDefault();
+      e.stopPropagation();
+      return this._openFile(e.dataTransfer?.files[0]);
+    } else {
+      return new Promise<void>((resolve, reject) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = () => {
+          this._openFile(input.files?.[0])
+            .then(resolve)
+            .catch((e) => {
+              reject(e);
+            });
+        };
+        input.click();
+      });
+    }
+  }
+
   public saveImage(): void {
     const gl = this.gl;
     const canvas = gl.canvas as HTMLCanvasElement;
@@ -322,10 +418,19 @@ export class EditorService {
   }
 
   public closeImage(): void {
-    this._core.closeFile();
+    this.closeFile();
     if (this._gl !== null) {
-      this._viewerProgram.delete(this._gl);
+      this._program.viewer.delete(this._gl);
       this._gl = null;
+    }
+  }
+
+  public closeFile(): void {
+    if (this._file !== undefined) delete this._file;
+
+    if (this._image !== undefined) {
+      URL.revokeObjectURL(this._image.src);
+      delete this._image;
     }
   }
 }

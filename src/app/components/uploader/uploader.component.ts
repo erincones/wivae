@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
+import { Alert } from 'src/app/classes/alert';
 import { AlertType } from 'src/app/enums/alert-type';
-import { CoreService } from 'src/app/services/core.service';
-import { AlertsService } from 'src/app/services/alerts.service';
+import { EditorService } from 'src/app/services/editor.service';
+import { GUIService } from 'src/app/services/gui.service';
 
 @Component({
   selector: 'wivae-uploader',
@@ -10,7 +11,7 @@ import { AlertsService } from 'src/app/services/alerts.service';
 export class UploaderComponent {
   private _dragging: boolean;
 
-  constructor(private _core: CoreService, private _alerts: AlertsService) {
+  constructor(private _editor: EditorService, private _gui: GUIService) {
     this._dragging = false;
   }
 
@@ -34,13 +35,15 @@ export class UploaderComponent {
   }
 
   public handleFile(e?: DragEvent): void {
-    this._core
+    this._editor
       .uploadFile(e)
       .then(() => {
-        this._alerts.clear();
+        this._gui.clearAlerts();
       })
       .catch((e: string) => {
-        this._alerts.push(AlertType.ERROR, `Cannot open the given file: ${e}`);
+        this._gui.pushAlert(
+          new Alert(AlertType.ERROR, `Cannot open the given file: ${e}`)
+        );
       })
       .finally(() => {
         this._dragging = false;

@@ -97,7 +97,12 @@
 >
   <fa-icon [icon]="faRotateLeft"></fa-icon>
 </button>
-<button type="button" title="Flip vertical" [disabled]="notOpen" class="button">
+<button
+  type="button"
+  title="Flip vertical"
+  [disabled]="notOpen"
+  class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
+>
   <fa-icon [icon]="faRightLeft" [rotate]="90"></fa-icon>
 </button>
 <button

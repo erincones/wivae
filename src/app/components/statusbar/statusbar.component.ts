@@ -6,8 +6,8 @@ import {
   faInfo,
   faPenRuler,
 } from '@fortawesome/free-solid-svg-icons';
-import { CoreService } from 'src/app/services/core.service';
 import { EditorService } from 'src/app/services/editor.service';
+import { GUIService } from 'src/app/services/gui.service';
 
 @Component({
   selector: 'wivae-statusbar',
@@ -19,7 +19,7 @@ export class StatusbarComponent {
   public readonly faPenRuler: IconDefinition;
   public readonly faInfo: IconDefinition;
 
-  public constructor(public core: CoreService, public editor: EditorService) {
+  public constructor(public editor: EditorService, public gui: GUIService) {
     this.faCaretLeft = faCaretLeft;
     this.faCaretRight = faCaretRight;
     this.faPenRuler = faPenRuler;

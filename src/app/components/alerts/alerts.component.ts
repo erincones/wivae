@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { AlertType } from 'src/app/enums/alert-type';
-import { AlertsService } from 'src/app/services/alerts.service';
+import { GUIService } from 'src/app/services/gui.service';
 
 @Component({
   selector: 'wivae-alerts',
   templateUrl: './alerts.component.html',
 })
 export class AlertComponent {
-  public constructor(public alerts: AlertsService) {}
+  public constructor(public gui: GUIService) {}
 
   public handleClick(index: number): void {
-    this.alerts.close(index);
+    this.gui.closeAlert(index);
   }
 
   public className(type: AlertType): string {

@@ -8,10 +8,11 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { Alert } from 'src/app/classes/alert';
 import { AlertType } from 'src/app/enums/alert-type';
 import { vec3 } from 'src/app/libs/lar';
-import { AlertsService } from 'src/app/services/alerts.service';
 import { EditorService } from 'src/app/services/editor.service';
+import { GUIService } from 'src/app/services/gui.service';
 
 @Component({
   selector: 'wivae-canvas',
@@ -28,7 +29,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   public constructor(
     private _cd: ChangeDetectorRef,
     private _host: ElementRef<HTMLDivElement>,
-    private _alerts: AlertsService,
+    private _gui: GUIService,
     private _editor: EditorService
   ) {
     this._observer = new ResizeObserver(this._resizeViewport.bind(this));
@@ -80,9 +81,8 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
       this._editor.setup(this._canvas.nativeElement);
       this._resizeViewport();
     } catch (e) {
-      this._alerts.push(
-        AlertType.ERROR,
-        e instanceof Error ? e.message : String(e)
+      this._gui.pushAlert(
+        new Alert(AlertType.ERROR, e instanceof Error ? e.message : String(e))
       );
       this._cd.detectChanges();
     }

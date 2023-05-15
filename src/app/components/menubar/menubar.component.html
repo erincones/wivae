@@ -11,7 +11,7 @@
   type="button"
   title="Download"
   [disabled]="notOpen"
-  (click)="editor.saveImage()"
+  (click)="engine?.saveImage()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faDownload"></fa-icon>
@@ -20,7 +20,7 @@
   type="button"
   title="Close"
   [disabled]="notOpen"
-  (click)="editor.closeImage()"
+  (click)="closeImage()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faTrash"></fa-icon>
@@ -32,11 +32,11 @@
   type="button"
   title="Fit to canvas"
   [disabled]="notOpen"
-  (click)="editor.fit()"
+  (click)="engine?.fit()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
   [ngClass]="{
     'text-blue-700 hover:text-blue-800 active:text-blue-900 disabled:text-slate-400':
-      editor.fitted
+      engine?.fitted
   }"
 >
   <fa-layers>
@@ -48,11 +48,11 @@
   type="button"
   title="Real size"
   [disabled]="notOpen"
-  (click)="editor.realSize()"
+  (click)="engine?.realSize()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
   [ngClass]="{
     'text-blue-700 hover:text-blue-800 active:text-blue-900 disabled:text-slate-400':
-      editor.realSized
+      engine?.realSized
   }"
 >
   <fa-layers>
@@ -63,8 +63,8 @@
 <button
   type="button"
   title="Zoom in"
-  [disabled]="notOpen || !editor.canZoomIn"
-  (click)="editor.zoomIn()"
+  [disabled]="notOpen || !engine?.canZoomIn"
+  (click)="engine?.zoomIn()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faMagnifyingGlassPlus"></fa-icon>
@@ -72,8 +72,8 @@
 <button
   type="button"
   title="Zoom out"
-  [disabled]="notOpen || !editor.canZoomOut"
-  (click)="editor.zoomOut()"
+  [disabled]="notOpen || !engine?.canZoomOut"
+  (click)="engine?.zoomOut()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faMagnifyingGlassMinus"></fa-icon>

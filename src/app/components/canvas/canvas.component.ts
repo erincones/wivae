@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { Alert } from 'src/app/classes/alert';
 import { AlertType } from 'src/app/enums/alert-type';
-import { vec3 } from 'src/app/libs/lar';
+import { vec2 } from 'src/app/libs/lar';
 import { EditorService } from 'src/app/services/editor.service';
 import { GUIService } from 'src/app/services/gui.service';
 
@@ -19,7 +19,7 @@ import { GUIService } from 'src/app/services/gui.service';
   templateUrl: './canvas.component.html',
 })
 export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
-  @ViewChild('canvas')
+  @ViewChild('canvas', { static: true })
   private _canvas!: ElementRef<HTMLCanvasElement>;
 
   private _observer: ResizeObserver;
@@ -51,14 +51,14 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     canvas.width = width * devicePixelRatio;
     canvas.height = height * devicePixelRatio;
 
-    this._editor.resizeViewport(canvas.width, canvas.height);
+    this._editor.engine?.resizeViewport();
   }
 
   @HostListener('window:mousemove', ['$event'])
   private _handleMouseMove(e: MouseEvent): void {
     this.dumb(e);
     if (this._moving) {
-      this._editor.translate(vec3.new(e.movementX, -e.movementY, 0));
+      this._editor.engine?.translate(vec2.new(e.movementX, -e.movementY));
     }
   }
 
@@ -78,7 +78,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
 
   public ngAfterViewInit(): void {
     try {
-      this._editor.setup(this._canvas.nativeElement);
+      this._editor.engine?.setup(this._canvas.nativeElement);
       this._resizeViewport();
     } catch (e) {
       this._gui.pushAlert(
@@ -105,13 +105,12 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
 
   public handleWheel(e: WheelEvent): void {
     const dim = this._canvas.nativeElement.getBoundingClientRect();
-    const target = vec3.new(
+    const target = vec2.new(
       dim.left + dim.width / 2 - e.x,
-      e.y - dim.top - dim.height / 2,
-      0
+      e.y - dim.top - dim.height / 2
     );
 
-    if (e.deltaY < 0) this._editor.zoomIn(target);
-    if (e.deltaY > 0) this._editor.zoomOut(target);
+    if (e.deltaY < 0) this._editor.engine?.zoomIn(target);
+    else if (e.deltaY > 0) this._editor.engine?.zoomOut(target);
   }
 }

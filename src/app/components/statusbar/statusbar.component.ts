@@ -25,4 +25,8 @@ export class StatusbarComponent {
     this.faPenRuler = faPenRuler;
     this.faInfo = faInfo;
   }
+
+  public get summary(): ReadonlyArray<string> {
+    return this.editor.engine?.summary || ['No image open yet'];
+  }
 }

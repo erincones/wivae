@@ -1,4 +1,4 @@
-export enum ViewerStatus {
+export enum EditorStatus {
   /** Unsupported system */
   UNSUPPORTED = 0x01,
 

@@ -15,15 +15,15 @@
     ></wivae-menubar>
     <main class="flex-grow bg-slate-50" [ngSwitch]="editor.status">
       <wivae-uploader
-        *ngSwitchCase="ViewerStatus.EMPTY"
+        *ngSwitchCase="EditorStatus.EMPTY"
         class="relative h-full text-slate-500"
       ></wivae-uploader>
       <wivae-canvas
-        *ngSwitchCase="ViewerStatus.OPEN"
+        *ngSwitchCase="EditorStatus.OPEN"
         class="relative block h-full"
       ></wivae-canvas>
       <div
-        *ngSwitchCase="ViewerStatus.LOADING"
+        *ngSwitchCase="EditorStatus.LOADING"
         class="flex h-full items-center justify-center"
       >
         <fa-icon
@@ -32,7 +32,7 @@
         ></fa-icon>
       </div>
       <div
-        *ngSwitchCase="ViewerStatus.UNSUPPORTED"
+        *ngSwitchCase="EditorStatus.UNSUPPORTED"
         class="flex h-full items-center justify-center leading-tight"
       >
         <pre> ______________________________

@@ -17,8 +17,9 @@ import {
   faUpload,
 } from '@fortawesome/free-solid-svg-icons';
 import { Alert } from 'src/app/classes/alert';
+import { Engine } from 'src/app/classes/engine';
 import { AlertType } from 'src/app/enums/alert-type';
-import { ViewerStatus } from 'src/app/enums/viewer-status';
+import { EditorStatus } from 'src/app/enums/editor-status';
 import { EditorService } from 'src/app/services/editor.service';
 import { GUIService } from 'src/app/services/gui.service';
 
@@ -42,7 +43,7 @@ export class MenubarComponent {
   public readonly faSquare: IconDefinition;
   public readonly faTrash: IconDefinition;
 
-  public constructor(private _gui: GUIService, public editor: EditorService) {
+  public constructor(private _editor: EditorService, private _gui: GUIService) {
     this.fa1 = fa1;
     this.faCircle = faCircle;
     this.faDownload = faDownload;
@@ -59,20 +60,24 @@ export class MenubarComponent {
     this.faTrash = faTrash;
   }
 
+  public get engine(): Engine | undefined {
+    return this._editor.engine;
+  }
+
   public get unusable(): boolean {
     return (
-      this.editor.status === ViewerStatus.UNSUPPORTED ||
-      this.editor.status === ViewerStatus.ERROR
+      this._editor.status === EditorStatus.UNSUPPORTED ||
+      this._editor.status === EditorStatus.ERROR
     );
   }
 
   public get notOpen(): true | null {
-    return this.editor.status !== ViewerStatus.OPEN || null;
+    return this._editor.status !== EditorStatus.OPEN || null;
   }
 
   public handleFile(): void {
-    this.editor
-      .uploadFile()
+    this._editor
+      .openImage()
       .then(() => {
         this._gui.clearAlerts();
       })
@@ -81,5 +86,9 @@ export class MenubarComponent {
           new Alert(AlertType.ERROR, `Cannot open the given file: ${e}`)
         );
       });
+  }
+
+  public closeImage(): void {
+    this._editor.engine?.saveImage();
   }
 }

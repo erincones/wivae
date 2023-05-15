@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FaConfig } from '@fortawesome/angular-fontawesome';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
-import { ViewerStatus } from './enums/viewer-status';
+import { EditorStatus } from './enums/editor-status';
 import { EditorService } from './services/editor.service';
 import { GUIService } from './services/gui.service';
 
@@ -11,7 +11,7 @@ import { GUIService } from './services/gui.service';
   templateUrl: './app.component.html',
 })
 export class AppComponent {
-  public readonly ViewerStatus = ViewerStatus;
+  public readonly EditorStatus = EditorStatus;
 
   public readonly faCircleNotch: IconDefinition;
 

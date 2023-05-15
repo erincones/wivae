@@ -36,7 +36,7 @@ export class UploaderComponent {
 
   public handleFile(e?: DragEvent): void {
     this._editor
-      .uploadFile(e)
+      .openImage(e)
       .then(() => {
         this._gui.clearAlerts();
       })

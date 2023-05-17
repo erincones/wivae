@@ -60,11 +60,20 @@ export class ProgramCollection {
     src: string,
     name?: string
   ): WebGLShader {
+    let stage: string;
+    switch (type) {
+      case WebGL2RenderingContext.VERTEX_SHADER:
+        stage = '(vertex)';
+        break;
+      case WebGL2RenderingContext.FRAGMENT_SHADER:
+        stage = '(fragment)';
+        break;
+      default:
+        stage = '(unknown)';
+    }
+
+    const log = name ? `${name} ${stage}` : stage;
     const shader = this._gl.createShader(type);
-    const log = [
-      name,
-      type === WebGL2RenderingContext.VERTEX_SHADER ? '(vertex)' : '(fragment)',
-    ].join(' ');
 
     if (shader === null) throw new Error(`Could not create the shader: ${log}`);
 

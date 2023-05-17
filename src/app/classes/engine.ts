@@ -64,14 +64,14 @@ export class Engine {
     this._fitted = true;
   }
 
-  private _project(point: vec2): vec2 {
+  private _projectPoint(point: vec2): vec2 {
     return vec2.div(
       vec2.scale(point, (2 * devicePixelRatio) / this._zoom),
       this._imageSize
     );
   }
 
-  private _translatePosition(translation: vec2): boolean {
+  private _translatePosition(translation: vec2): vec2 {
     const offset = vec2.div(
       vec2.scale(
         vec2.sub(vec2.scale(this._imageSize, this._zoom), this._canvasSize),
@@ -91,28 +91,7 @@ export class Engine {
     if (offY <= 0) position[1] = 0;
     else if (delta[1] > offY) position[1] = position[1] > 0 ? offY : -offY;
 
-    if (!vec2.equals(this._position, position)) {
-      this._position = position;
-      return true;
-    }
-
-    return false;
-  }
-
-  private _updateZoom(factor: number, origin = vec2.zero()): void {
-    let zoom = this._zoom * factor;
-
-    if (zoom > Engine._MAX_ZOOM) zoom = Engine._MAX_ZOOM;
-    else if (zoom < this._minZoom) zoom = this._minZoom;
-
-    if (zoom !== this._zoom) {
-      const source = this._project(origin);
-      this._zoom = zoom;
-      this._fitted = this._zoom === this._minZoom;
-
-      this._translatePosition(vec2.sub(source, this._project(origin)));
-      this._updateView();
-    }
+    return position;
   }
 
   private _updateView(): void {
@@ -266,29 +245,45 @@ export class Engine {
   }
 
   public translate(movement: vec2): void {
-    if (this._translatePosition(this._project(movement))) this._updateView();
-  }
+    const position = this._translatePosition(this._projectPoint(movement));
 
-  public zoomIn(origin?: vec2): void {
-    if (this.canZoomIn) {
-      this._updateZoom(Engine._ZOOM_FACTOR, origin);
+    if (!vec2.equals(position, this._position)) {
+      this._position = position;
+      this._updateView();
     }
   }
 
-  public zoomOut(origin?: vec2): void {
-    if (this.canZoomOut) {
-      this._updateZoom(1 / Engine._ZOOM_FACTOR, origin);
+  public setZoom(zoom: number, target = vec2.zero()): void {
+    if (zoom > Engine._MAX_ZOOM) zoom = Engine._MAX_ZOOM;
+    else if (zoom < this._minZoom) zoom = this._minZoom;
+
+    if (zoom !== this._zoom) {
+      const source = this._projectPoint(target);
+      this._zoom = zoom;
+      this._fitted = false;
+
+      this._position = this._translatePosition(
+        vec2.sub(source, this._projectPoint(target))
+      );
+      this._updateView();
     }
+  }
+
+  public zoomIn(target?: vec2): void {
+    this.setZoom(this._zoom * Engine._ZOOM_FACTOR, target);
+  }
+
+  public zoomOut(target?: vec2): void {
+    this.setZoom(this._zoom / Engine._ZOOM_FACTOR, target);
   }
 
   public fit(): void {
-    if (this._zoom !== this._minZoom) {
-      this._updateZoom(this._minZoom / this._zoom);
-    }
+    this.setZoom(this._minZoom);
+    this._fitted = true;
   }
 
   public realSize(): void {
-    if (this._zoom !== 1) this._updateZoom(1 / this._zoom);
+    this.setZoom(1);
   }
 
   public saveImage(): void {

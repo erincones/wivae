@@ -38,6 +38,10 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('window:resize')
   private _resizeViewport(): void {
+    const engine = this._editor.engine;
+
+    if (engine === undefined) return;
+
     const host = this._host.nativeElement;
     const canvas = this._canvas.nativeElement;
 
@@ -51,15 +55,16 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     canvas.width = width * devicePixelRatio;
     canvas.height = height * devicePixelRatio;
 
-    this._editor.engine?.resizeViewport();
+    engine.resizeViewport();
   }
 
   @HostListener('window:mousemove', ['$event'])
   private _handleMouseMove(e: MouseEvent): void {
     this.dumb(e);
-    if (this._moving) {
-      this._editor.engine?.translate(vec2.new(e.movementX, -e.movementY));
-    }
+    const engine = this._editor.engine;
+
+    if (engine !== undefined && this._moving)
+      engine.translate(vec2.new(e.movementX, -e.movementY));
   }
 
   @HostListener('window:mouseup', ['$event'])
@@ -104,13 +109,17 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   public handleWheel(e: WheelEvent): void {
+    const engine = this._editor.engine;
+
+    if (engine === undefined) return;
+
     const dim = this._canvas.nativeElement.getBoundingClientRect();
     const target = vec2.new(
       dim.left + dim.width / 2 - e.x,
       e.y - dim.top - dim.height / 2
     );
 
-    if (e.deltaY < 0) this._editor.engine?.zoomIn(target);
-    else if (e.deltaY > 0) this._editor.engine?.zoomOut(target);
+    if (e.deltaY < 0) engine.zoomIn(target);
+    else if (e.deltaY > 0) engine.zoomOut(target);
   }
 }

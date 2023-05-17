@@ -34,10 +34,7 @@
   [disabled]="notOpen"
   (click)="engine?.fit()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
-  [ngClass]="{
-    'text-blue-700 hover:text-blue-800 active:text-blue-900 disabled:text-slate-400':
-      engine?.fitted
-  }"
+  [ngClass]="{ 'text-blue-700': engine?.fitted }"
 >
   <fa-layers>
     <fa-icon [icon]="faSquare"></fa-icon>
@@ -50,10 +47,7 @@
   [disabled]="notOpen"
   (click)="engine?.realSize()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
-  [ngClass]="{
-    'text-blue-700 hover:text-blue-800 active:text-blue-900 disabled:text-slate-400':
-      engine?.realSized
-  }"
+  [ngClass]="{ 'text-blue-700': engine?.realSized }"
 >
   <fa-layers>
     <fa-icon [icon]="faSquare"></fa-icon>

@@ -89,6 +89,6 @@ export class MenubarComponent {
   }
 
   public closeImage(): void {
-    this._editor.engine?.saveImage();
+    this._editor.closeImage();
   }
 }

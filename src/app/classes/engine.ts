@@ -1,6 +1,7 @@
-import { Program } from '../enums/program';
+import { Effect } from '../enums/effect';
 import { mat4, vec2, vec3 } from '../libs/lar';
-import { ProgramCollection } from './program-collection';
+import { EffectData, EffectStack } from './effect-stack';
+import { ProgramsCollection } from './programs-collection';
 
 export class Engine {
   private static readonly _CONTEXT_ATTRIBUTES: WebGLContextAttributes = {
@@ -12,8 +13,8 @@ export class Engine {
   };
 
   private static readonly _SQUARE: Float32Array = new Float32Array([
-    -1.0, 1.0, 0.0, 0.0, -1.0, -1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, -1.0,
-    1.0, 1.0,
+    -1.0, 1.0, 0.0, 1.0, -1.0, -1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
+    1.0, 0.0,
   ]);
 
   private static readonly _INDEXES: Int8Array = new Int8Array([0, 1, 2, 3]);
@@ -24,15 +25,15 @@ export class Engine {
 
   private _gl!: WebGL2RenderingContext;
 
-  private _program!: ProgramCollection;
+  private _program!: ProgramsCollection;
+
+  private _effect!: EffectStack;
 
   private _canvas!: HTMLCanvasElement;
 
   private _image: HTMLImageElement;
 
   private _file: File;
-
-  private _history: undefined;
 
   private _canvasSize: vec2;
 
@@ -53,7 +54,6 @@ export class Engine {
   public constructor(file: File, image: HTMLImageElement) {
     this._image = image;
     this._file = file;
-    this._history = undefined;
     this._imageSize = vec2.new(this._image.width, this._image.height);
     this._canvasSize = vec2.zero();
     this._ratio = vec2.zero();
@@ -95,6 +95,7 @@ export class Engine {
   }
 
   private _updateView(): void {
+    this._program.use(Effect.VIEWER);
     this._gl.uniformMatrix4fv(
       this._program.getUniformLocation('u_view'),
       false,
@@ -107,7 +108,9 @@ export class Engine {
     this._draw();
   }
 
-  private _draw(): void {
+  private _applyEffect(data: EffectData): void {
+    this._program.use(data.effect);
+
     this._gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
     this._gl.drawElements(
       WebGL2RenderingContext.TRIANGLE_STRIP,
@@ -115,6 +118,16 @@ export class Engine {
       WebGL2RenderingContext.UNSIGNED_BYTE,
       0
     );
+  }
+
+  private _draw(): void {
+    this._effect.applyEffects(
+      this._imageSize,
+      this._canvasSize,
+      this._applyEffect
+    );
+
+    this._applyEffect({ effect: Effect.VIEWER });
   }
 
   public get bg(): vec3 {
@@ -157,7 +170,7 @@ export class Engine {
       'webgl2',
       Engine._CONTEXT_ATTRIBUTES
     ) as WebGL2RenderingContext;
-    this._program = new ProgramCollection(this._gl);
+    this._program = new ProgramsCollection(this._gl);
 
     this._gl.clearColor(...vec3.scale(this._bg, 1 / 255), 1);
     this._gl.enable(this._gl.BLEND);
@@ -188,43 +201,9 @@ export class Engine {
     this._gl.enableVertexAttribArray(1);
     this._gl.vertexAttribPointer(1, 2, this._gl.FLOAT, false, 16, 8);
 
-    const texture = this._gl.createTexture();
-    this._gl.activeTexture(this._gl.TEXTURE0);
-    this._gl.bindTexture(this._gl.TEXTURE_2D, texture);
+    this._effect = new EffectStack(this._gl, this._image);
 
-    this._gl.pixelStorei(WebGL2RenderingContext.UNPACK_FLIP_Y_WEBGL, true);
-    this._gl.texImage2D(
-      WebGL2RenderingContext.TEXTURE_2D,
-      0,
-      WebGL2RenderingContext.RGBA,
-      WebGL2RenderingContext.RGBA,
-      WebGL2RenderingContext.UNSIGNED_BYTE,
-      this._image
-    );
-
-    this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
-    this._gl.texParameteri(
-      WebGL2RenderingContext.TEXTURE_2D,
-      WebGL2RenderingContext.TEXTURE_WRAP_S,
-      WebGL2RenderingContext.CLAMP_TO_EDGE
-    );
-    this._gl.texParameteri(
-      WebGL2RenderingContext.TEXTURE_2D,
-      WebGL2RenderingContext.TEXTURE_WRAP_T,
-      WebGL2RenderingContext.CLAMP_TO_EDGE
-    );
-    this._gl.texParameteri(
-      WebGL2RenderingContext.TEXTURE_2D,
-      WebGL2RenderingContext.TEXTURE_MAG_FILTER,
-      WebGL2RenderingContext.NEAREST
-    );
-    this._gl.texParameteri(
-      this._gl.TEXTURE_2D,
-      this._gl.TEXTURE_MIN_FILTER,
-      this._gl.LINEAR_MIPMAP_LINEAR
-    );
-
-    this._program.use(Program.VIEWER);
+    this._program.use(Effect.VIEWER);
     this._gl.uniform1i(this._program.getUniformLocation('u_img'), 0);
   }
 
@@ -319,5 +298,6 @@ export class Engine {
 
   public release(): void {
     this._program.release();
+    this._effect.release();
   }
 }

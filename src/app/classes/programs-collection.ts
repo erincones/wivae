@@ -1,16 +1,16 @@
-import { Program } from '../enums/program';
+import { Effect } from '../enums/effect';
 import { fragment, vertex } from '../libs/shaders';
 
-export class ProgramCollection {
+export class ProgramsCollection {
   private _gl: WebGL2RenderingContext;
 
-  private _programs: Readonly<Record<Program, WebGLProgram>>;
+  private _programs: Readonly<Record<Effect, WebGLProgram>>;
 
   private _uniforms: Readonly<
-    Record<Program, Map<string, WebGLUniformLocation | null>>
+    Record<Effect, Map<string, WebGLUniformLocation | null>>
   >;
 
-  private _active: Program | null;
+  private _active: Effect | null;
 
   public constructor(gl: WebGL2RenderingContext) {
     this._gl = gl;
@@ -28,14 +28,14 @@ export class ProgramCollection {
     } as const;
 
     this._programs = {
-      [Program.VIEWER]: this._link(
+      [Effect.VIEWER]: this._link(
         shaders.vertex.view,
-        shaders.fragment.original
+        shaders.fragment.neutral
       ),
     };
 
     this._uniforms = {
-      [Program.VIEWER]: new Map<string, WebGLUniformLocation>(),
+      [Effect.VIEWER]: new Map<string, WebGLUniformLocation>(),
     };
 
     Object.values(shaders).forEach((array) => {
@@ -120,7 +120,7 @@ export class ProgramCollection {
     return program;
   }
 
-  public use(program: Program | null): void {
+  public use(program: Effect | null): void {
     this._active = program;
     this._gl.useProgram(program === null ? null : this._programs[program]);
   }

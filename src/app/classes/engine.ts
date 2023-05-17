@@ -108,7 +108,7 @@ export class Engine {
     this._draw();
   }
 
-  private _applyEffect(data: EffectData): void {
+  private _drawEffect(data: EffectData): void {
     this._program.use(data.effect);
 
     this._gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
@@ -121,13 +121,8 @@ export class Engine {
   }
 
   private _draw(): void {
-    this._effect.applyEffects(
-      this._imageSize,
-      this._canvasSize,
-      this._applyEffect
-    );
-
-    this._applyEffect({ effect: Effect.VIEWER });
+    this._effect.traverse(this._imageSize, this._canvasSize, this._drawEffect);
+    this._drawEffect({ effect: Effect.VIEWER });
   }
 
   public get bg(): vec3 {
@@ -161,7 +156,10 @@ export class Engine {
   }
 
   public get summary(): ReadonlyArray<string> {
-    return [`Changes: ${0}`, `Zoom: ${(this._zoom * 100).toFixed(2)}%`];
+    return [
+      `Effects: ${this._effect.length}`,
+      `Zoom: ${(this._zoom * 100).toFixed(2)}%`,
+    ];
   }
 
   public setup(canvas: HTMLCanvasElement) {

@@ -69,6 +69,10 @@ export class EffectStack {
     this._stack = [];
   }
 
+  public get length(): number {
+    return this._stack.length;
+  }
+
   private _createTexture(
     magFilter: WebGLFilter = WebGL2RenderingContext.NEAREST,
     minFilter: WebGLFilter = WebGL2RenderingContext.NEAREST
@@ -154,12 +158,12 @@ export class EffectStack {
     delete this._applied;
   }
 
-  public applyEffects(
+  public traverse(
     imageSize: vec2,
     canvasSize: vec2,
     callBack: (data: EffectData) => void
   ): void {
-    const effects = this._stack.length;
+    const effects = this.length;
 
     if (this._applied === effects) return;
 

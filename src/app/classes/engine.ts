@@ -125,6 +125,10 @@ export class Engine {
     this._drawEffect({ effect: Effect.VIEWER });
   }
 
+  public get file(): File {
+    return this._file;
+  }
+
   public get bg(): vec3 {
     return this._bg;
   }

@@ -1,0 +1,14 @@
+<wivae-section name="File information" [open]="true">
+  <ul>
+    <li *ngFor="let field of fileInfo" class="mb-1 flex">
+      <label [htmlFor]="field.id" class="w-16">{{ field.label }}</label>
+      <input
+        id="{{ field.id }}"
+        type="text"
+        readonly
+        [value]="field.value"
+        class="m-0 flex-grow border-0 bg-slate-50 px-1 py-0 text-sm"
+      />
+    </li>
+  </ul>
+</wivae-section>

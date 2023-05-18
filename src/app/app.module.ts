@@ -9,6 +9,7 @@ import { CanvasComponent } from './components/canvas/canvas.component';
 import { InfobarComponent } from './components/infobar/infobar.component';
 import { MenubarComponent } from './components/menubar/menubar.component';
 import { ModalComponent } from './components/modal/modal.component';
+import { SectionComponent } from './components/section/section.component';
 import { StatusbarComponent } from './components/statusbar/statusbar.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { UploaderComponent } from './components/uploader/uploader.component';
@@ -21,6 +22,7 @@ import { UploaderComponent } from './components/uploader/uploader.component';
     InfobarComponent,
     MenubarComponent,
     ModalComponent,
+    SectionComponent,
     StatusbarComponent,
     ToolbarComponent,
     UploaderComponent,

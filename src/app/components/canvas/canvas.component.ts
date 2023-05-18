@@ -60,7 +60,6 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('window:mousemove', ['$event'])
   private _handleMouseMove(e: MouseEvent): void {
-    this.dumb(e);
     const engine = this._editor.engine;
 
     if (engine !== undefined && this._moving)
@@ -69,7 +68,6 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('window:mouseup', ['$event'])
   private _handleMouseUp(e: MouseEvent): void {
-    this.dumb(e);
     if (e.button === 0) this._moving = false;
   }
 
@@ -98,13 +96,13 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     this._editor.closeImage();
   }
 
-  public dumb(e: Event): void {
+  public dummy(e: Event): void {
     e.preventDefault();
     e.stopPropagation();
   }
 
   public handleMouseDown(e: MouseEvent): void {
-    this.dumb(e);
+    this.dummy(e);
     if (e.button === 0) this._moving = true;
   }
 

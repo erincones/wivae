@@ -19,14 +19,10 @@ export class StatusbarComponent {
   public readonly faPenRuler: IconDefinition;
   public readonly faInfo: IconDefinition;
 
-  public constructor(private _editor: EditorService, public gui: GUIService) {
+  public constructor(public editor: EditorService, public gui: GUIService) {
     this.faCaretLeft = faCaretLeft;
     this.faCaretRight = faCaretRight;
     this.faPenRuler = faPenRuler;
     this.faInfo = faInfo;
-  }
-
-  public get summary(): ReadonlyArray<string> {
-    return this._editor.engine?.summary || ['No image open yet'];
   }
 }

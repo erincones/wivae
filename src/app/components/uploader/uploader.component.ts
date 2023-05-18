@@ -15,7 +15,7 @@ export class UploaderComponent {
     this._dragging = false;
   }
 
-  private _dumb(e: Event): void {
+  private _dummy(e: Event): void {
     e.preventDefault();
     e.stopPropagation();
   }
@@ -25,12 +25,12 @@ export class UploaderComponent {
   }
 
   public handleDrag(e: DragEvent): void {
-    this._dumb(e);
+    this._dummy(e);
     this._dragging = true;
   }
 
   public handleDragLeave(e: DragEvent): void {
-    this._dumb(e);
+    this._dummy(e);
     this._dragging = false;
   }
 

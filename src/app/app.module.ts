@@ -14,6 +14,9 @@ import { StatusbarComponent } from './components/statusbar/statusbar.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { UploaderComponent } from './components/uploader/uploader.component';
 
+import { FileInfoPipe } from './pipes/file-info.pipe';
+import { SummaryPipe } from './pipes/summary.pipe';
+
 @NgModule({
   declarations: [
     AlertComponent,
@@ -26,6 +29,8 @@ import { UploaderComponent } from './components/uploader/uploader.component';
     StatusbarComponent,
     ToolbarComponent,
     UploaderComponent,
+    FileInfoPipe,
+    SummaryPipe,
   ],
   imports: [BrowserModule, AppRoutingModule, FontAwesomeModule],
   providers: [],

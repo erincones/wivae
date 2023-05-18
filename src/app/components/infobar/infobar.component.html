@@ -1,6 +1,6 @@
 <wivae-section name="File information" [open]="true">
   <ul>
-    <li *ngFor="let field of fileInfo" class="mb-1 flex">
+    <li *ngFor="let field of file | fileInfo" class="mb-1 flex">
       <label [htmlFor]="field.id" class="w-16">{{ field.label }}</label>
       <input
         id="{{ field.id }}"

@@ -10,9 +10,11 @@
 
 <span class="mx-2 border-l border-slate-400"></span>
 
-<span *ngFor="let field of summary" class="mr-4 text-sm leading-none">{{
-  field
-}}</span>
+<span
+  *ngFor="let field of editor.engine | summary"
+  class="mr-4 text-sm leading-none"
+  >{{ field }}</span
+>
 
 <span class="flex-grow"></span>
 

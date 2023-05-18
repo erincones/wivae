@@ -129,6 +129,10 @@ export class Engine {
     return this._file;
   }
 
+  public get history(): Readonly<EffectStack> {
+    return this._effect;
+  }
+
   public get bg(): vec3 {
     return this._bg;
   }
@@ -157,13 +161,6 @@ export class Engine {
 
   public get realSized(): boolean {
     return this._zoom === 1;
-  }
-
-  public get summary(): ReadonlyArray<string> {
-    return [
-      `Effects: ${this._effect.length}`,
-      `Zoom: ${(this._zoom * 100).toFixed(2)}%`,
-    ];
   }
 
   public setup(canvas: HTMLCanvasElement) {

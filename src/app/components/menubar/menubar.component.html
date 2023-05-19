@@ -95,6 +95,7 @@
   type="button"
   title="Flip vertical"
   [disabled]="disabled"
+  (click)="engine?.flipVertical()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faRightLeft" [rotate]="90"></fa-icon>
@@ -102,6 +103,7 @@
 <button
   type="button"
   title="Flip horizontal"
+  (click)="engine?.flipHorizontal()"
   [disabled]="disabled"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >

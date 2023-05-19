@@ -32,6 +32,14 @@ export class ProgramsCollection {
         shaders.vertex.view,
         shaders.fragment.neutral
       ),
+      [Effect.FLIP_VERTICAL]: this._link(
+        shaders.vertex.flipVertical,
+        shaders.fragment.neutral
+      ),
+      [Effect.FLIP_HORIZONTAL]: this._link(
+        shaders.vertex.flipHorizontal,
+        shaders.fragment.neutral
+      ),
       [Effect.GRAYSCALE_HSL_L]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.grayscaleHSL

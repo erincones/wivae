@@ -44,6 +44,8 @@ export class EffectStack {
 
   private _stack: EffectData[];
 
+  private _untraversed: boolean;
+
   private _from: number;
 
   private _to: number;
@@ -88,6 +90,7 @@ export class EffectStack {
     }
 
     this._stack = [];
+    this._untraversed = true;
     this._from = 0;
     this._to = 0;
   }
@@ -194,6 +197,7 @@ export class EffectStack {
     if (this.canUndo) {
       this._from = 0;
       --this._to;
+      this._untraversed = this._to === 0;
       return true;
     }
 
@@ -214,10 +218,17 @@ export class EffectStack {
     canvasSize: vec2,
     callBack: (data: EffectData) => void
   ): void {
-    const effects = this.length;
+    if (this._untraversed) {
+      this.bindTexture();
+      this.bindFBO();
+      this._untraversed = false;
+      return;
+    }
 
-    this.bindTexture();
+    if (this._stack.length === 0 || this._from === this._to) return;
+
     this._gl.viewport(0, 0, imageSize[0], imageSize[1]);
+    if (this._from === 0) this.bindTexture();
 
     for (let i = this._from; i < this._to; ++i) {
       const curr = i & 1;
@@ -227,7 +238,6 @@ export class EffectStack {
     }
 
     this._from = this._to;
-
     this.bindFBO();
     this._gl.viewport(0, 0, canvasSize[0], canvasSize[1]);
   }

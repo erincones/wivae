@@ -301,12 +301,14 @@ export class Engine {
     this.setZoom(1);
   }
 
-  public undo(): void {
-    if (this._effect.undo()) this._draw();
+  public flipVertical(): void {
+    this._effect.pushEffect({ effect: Effect.FLIP_VERTICAL });
+    this._draw();
   }
 
-  public redo(): void {
-    if (this._effect.redo()) this._draw();
+  public flipHorizontal(): void {
+    this._effect.pushEffect({ effect: Effect.FLIP_HORIZONTAL });
+    this._draw();
   }
 
   public grayscale(
@@ -393,6 +395,14 @@ export class Engine {
         throw new Error('Unknown grayscale method');
     }
     this._draw();
+  }
+
+  public undo(): void {
+    if (this._effect.undo()) this._draw();
+  }
+
+  public redo(): void {
+    if (this._effect.redo()) this._draw();
   }
 
   public saveImage(): void {

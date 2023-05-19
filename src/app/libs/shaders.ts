@@ -10,6 +10,28 @@ void main () {
   f_st_coord = vec2(l_st_coord.s, l_st_coord.t);
   gl_Position = vec4(l_position, 1.0f);
 }`,
+  flipVertical: `#version 300 es
+
+layout (location = 0) in vec3 l_position;
+layout (location = 1) in vec2 l_st_coord;
+
+out vec2 f_st_coord;
+
+void main () {
+  f_st_coord = vec2(l_st_coord.s, 1.0f - l_st_coord.t);
+  gl_Position = vec4(l_position, 1.0f);
+}`,
+  flipHorizontal: `#version 300 es
+
+layout (location = 0) in vec3 l_position;
+layout (location = 1) in vec2 l_st_coord;
+
+out vec2 f_st_coord;
+
+void main () {
+  f_st_coord = vec2(1.0f - l_st_coord.s, l_st_coord.t);
+  gl_Position = vec4(l_position, 1.0f);
+}`,
   view: `#version 300 es
 
 layout (location = 0) in vec3 l_position;

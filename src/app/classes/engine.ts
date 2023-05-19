@@ -170,14 +170,14 @@ export class Engine {
     return this._effect;
   }
 
-  public get bg(): vec3 {
-    return this._bg;
-  }
-
   public set bg(bg: vec3) {
     this._bg = vec3.new(...bg);
     this._gl.clearColor(...vec3.scale(this._bg, 1 / 255), 1);
     this._draw();
+  }
+
+  public get bg(): vec3 {
+    return this._bg;
   }
 
   public get zoom(): number {
@@ -299,6 +299,14 @@ export class Engine {
 
   public realSize(): void {
     this.setZoom(1);
+  }
+
+  public undo(): void {
+    if (this._effect.undo()) this._draw();
+  }
+
+  public redo(): void {
+    if (this._effect.redo()) this._draw();
   }
 
   public grayscale(

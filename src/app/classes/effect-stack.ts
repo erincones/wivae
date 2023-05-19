@@ -44,7 +44,9 @@ export class EffectStack {
 
   private _stack: EffectData[];
 
-  private _applied?: number;
+  private _from: number;
+
+  private _to: number;
 
   public constructor(gl: WebGL2RenderingContext, image: HTMLImageElement) {
     this._gl = gl;
@@ -86,10 +88,20 @@ export class EffectStack {
     }
 
     this._stack = [];
+    this._from = 0;
+    this._to = 0;
   }
 
   public get length(): number {
-    return this._stack.length;
+    return this._to;
+  }
+
+  public get canUndo(): boolean {
+    return this._to > 0;
+  }
+
+  public get canRedo(): boolean {
+    return this._to < this._stack.length;
   }
 
   private _createTexture(
@@ -164,17 +176,37 @@ export class EffectStack {
   }
 
   public pushEffect(effect: EffectData): void {
-    this._stack.push(effect);
-  }
+    if (this._to < this._stack.length) {
+      this._stack.splice(this._to);
+    }
 
-  public popEffect(): void {
-    this._stack.pop();
-    delete this._applied;
+    this._stack.push(effect);
+    this._to = this._stack.length;
   }
 
   public clearEffects(): void {
     this._stack = [];
-    delete this._applied;
+    this._from = 0;
+    this._to = 0;
+  }
+
+  public undo(): boolean {
+    if (this.canUndo) {
+      this._from = 0;
+      --this._to;
+      return true;
+    }
+
+    return false;
+  }
+
+  public redo(): boolean {
+    if (this.canRedo) {
+      ++this._to;
+      return true;
+    }
+
+    return false;
   }
 
   public traverse(
@@ -184,25 +216,17 @@ export class EffectStack {
   ): void {
     const effects = this.length;
 
-    if (this._applied === effects) return;
+    this.bindTexture();
+    this._gl.viewport(0, 0, imageSize[0], imageSize[1]);
 
-    if (typeof this._applied !== 'number') {
-      this._applied = 0;
-      this.bindTexture();
+    for (let i = this._from; i < this._to; ++i) {
+      const curr = i & 1;
+      this.bindFBO(curr);
+      callBack(this._stack[i]);
+      this.bindTexture(curr);
     }
 
-    if (effects > 0) {
-      this._gl.viewport(0, 0, imageSize[0], imageSize[1]);
-
-      for (let i = this._applied; i < effects; ++i) {
-        const curr = i & 1;
-        this.bindFBO(curr);
-        callBack(this._stack[i]);
-        this.bindTexture(curr);
-      }
-    }
-
-    this._applied = effects;
+    this._from = this._to;
 
     this.bindFBO();
     this._gl.viewport(0, 0, canvasSize[0], canvasSize[1]);

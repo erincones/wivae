@@ -113,7 +113,8 @@
 <button
   type="button"
   title="Undo"
-  [disabled]="disabled"
+  [disabled]="disabled || !engine?.history?.canUndo"
+  (click)="engine?.undo()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faReply"></fa-icon>
@@ -121,7 +122,8 @@
 <button
   type="button"
   title="Redo"
-  [disabled]="disabled"
+  [disabled]="disabled || !engine?.history?.canRedo"
+  (click)="engine?.redo()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faShare"></fa-icon>

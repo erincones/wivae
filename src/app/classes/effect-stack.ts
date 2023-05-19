@@ -1,5 +1,6 @@
 import { Effect } from '../enums/effect';
-import { vec2 } from '../libs/lar';
+import { Uniform } from '../enums/uniform';
+import { mat4, vec2, vec3 } from '../libs/lar';
 
 type WebGLFilter = WebGL2RenderingContext[
   | 'NEAREST'
@@ -9,9 +10,27 @@ type WebGLFilter = WebGL2RenderingContext[
   | 'LINEAR_MIPMAP_NEAREST'
   | 'LINEAR_MIPMAP_LINEAR'];
 
+type EffectParam =
+  | {
+      readonly type: Uniform.FLOAT;
+      readonly value: number;
+    }
+  | {
+      readonly type: Uniform.FLOAT_VEC3;
+      readonly value: vec3;
+    }
+  | {
+      readonly type: Uniform.FLOAT_MAT4;
+      readonly value: mat4;
+    }
+  | {
+      readonly type: Uniform.FLOAT_ARRAY;
+      readonly value: Readonly<Float32Array>;
+    };
+
 export interface EffectData {
   readonly effect: Effect;
-  readonly params?: Readonly<Record<string, any>>;
+  readonly params?: Readonly<Record<string, EffectParam>>;
 }
 
 export class EffectStack {

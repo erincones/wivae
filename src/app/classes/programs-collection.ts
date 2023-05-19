@@ -32,11 +32,34 @@ export class ProgramsCollection {
         shaders.vertex.view,
         shaders.fragment.neutral
       ),
+      [Effect.GRAYSCALE_HSL_L]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.grayscaleHSL
+      ),
+      [Effect.GRAYSCALE_HSV_V]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.grayscaleHSV
+      ),
+      [Effect.GRAYSCALE_CIELAB_L]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.grayscaleCIELAB
+      ),
+      [Effect.GRAYSCALE_AVERAGE]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.grayscaleAVG
+      ),
+      [Effect.GRAYSCALE_WEIGHT]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.grayscaleWeight
+      ),
     };
 
-    this._uniforms = {
-      [Effect.VIEWER]: new Map<string, WebGLUniformLocation>(),
-    };
+    this._uniforms = Object.values(Effect).reduce((uniforms, effect) => {
+      if (typeof effect !== 'string')
+        uniforms[effect] = new Map<string, WebGLUniformLocation>();
+
+      return uniforms;
+    }, {} as Record<Effect, Map<string, WebGLUniformLocation | null>>);
 
     Object.values(shaders).forEach((array) => {
       Object.values(array).forEach((shader) => {
@@ -121,6 +144,8 @@ export class ProgramsCollection {
   }
 
   public use(program: Effect | null): void {
+    if (this._active === program) return;
+
     this._active = program;
     this._gl.useProgram(program === null ? null : this._programs[program]);
   }

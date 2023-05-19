@@ -14,8 +14,12 @@ import { StatusbarComponent } from './components/statusbar/statusbar.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { UploaderComponent } from './components/uploader/uploader.component';
 
+import { FileInfoComponent } from './components/infobar/file-info/file-info.component';
+import { GrayscaleComponent } from './components/toolbar/grayscale/grayscale.component';
+
 import { FileInfoPipe } from './pipes/file-info.pipe';
 import { SummaryPipe } from './pipes/summary.pipe';
+import { GrayscalePipe } from './pipes/grayscale.pipe';
 
 @NgModule({
   declarations: [
@@ -29,8 +33,11 @@ import { SummaryPipe } from './pipes/summary.pipe';
     StatusbarComponent,
     ToolbarComponent,
     UploaderComponent,
+    FileInfoComponent,
+    GrayscaleComponent,
     FileInfoPipe,
     SummaryPipe,
+    GrayscalePipe,
   ],
   imports: [BrowserModule, AppRoutingModule, FontAwesomeModule],
   providers: [],

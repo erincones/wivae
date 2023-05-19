@@ -1,4 +1,6 @@
 import { Effect } from '../enums/effect';
+import { Grayscale } from '../enums/grayscale';
+import { Uniform } from '../enums/uniform';
 import { mat4, vec2, vec3 } from '../libs/lar';
 import { EffectData, EffectStack } from './effect-stack';
 import { ProgramsCollection } from './programs-collection';
@@ -111,6 +113,37 @@ export class Engine {
   private _drawEffect(data: EffectData): void {
     this._program.use(data.effect);
 
+    if (data.params)
+      Object.entries(data.params).forEach(([name, param]) => {
+        switch (param.type) {
+          case Uniform.FLOAT:
+            this._gl.uniform1f(
+              this._program.getUniformLocation(name),
+              param.value
+            );
+            break;
+          case Uniform.FLOAT_VEC3:
+            this._gl.uniform3fv(
+              this._program.getUniformLocation(name),
+              param.value
+            );
+            break;
+          case Uniform.FLOAT_MAT4:
+            this._gl.uniformMatrix4fv(
+              this._program.getUniformLocation(name),
+              false,
+              param.value
+            );
+            break;
+          case Uniform.FLOAT_ARRAY:
+            this._gl.uniform1fv(
+              this._program.getUniformLocation(name),
+              param.value
+            );
+            break;
+        }
+      });
+
     this._gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
     this._gl.drawElements(
       WebGL2RenderingContext.TRIANGLE_STRIP,
@@ -121,7 +154,11 @@ export class Engine {
   }
 
   private _draw(): void {
-    this._effect.traverse(this._imageSize, this._canvasSize, this._drawEffect);
+    this._effect.traverse(
+      this._imageSize,
+      this._canvasSize,
+      this._drawEffect.bind(this)
+    );
     this._drawEffect({ effect: Effect.VIEWER });
   }
 
@@ -262,6 +299,92 @@ export class Engine {
 
   public realSize(): void {
     this.setZoom(1);
+  }
+
+  public grayscale(
+    type: Grayscale,
+    weights = vec3.new(1 / 3, 1 / 3, 1 / 3)
+  ): void {
+    switch (type) {
+      case Grayscale.HSL_L:
+        this._effect.pushEffect({ effect: Effect.GRAYSCALE_HSL_L });
+        break;
+      case Grayscale.HSV_V:
+        this._effect.pushEffect({ effect: Effect.GRAYSCALE_HSV_V });
+        break;
+      case Grayscale.CIELAB_L:
+        this._effect.pushEffect({ effect: Effect.GRAYSCALE_CIELAB_L });
+        break;
+      case Grayscale.REC_601:
+        this._effect.pushEffect({
+          effect: Effect.GRAYSCALE_WEIGHT,
+          params: {
+            u_weight: {
+              value: vec3.new(0.299, 0.587, 0.114),
+              type: Uniform.FLOAT_VEC3,
+            },
+          },
+        });
+        break;
+      case Grayscale.REC_709:
+        this._effect.pushEffect({
+          effect: Effect.GRAYSCALE_WEIGHT,
+          params: {
+            u_weight: {
+              value: vec3.new(0.2126, 0.7152, 0.0722),
+              type: Uniform.FLOAT_VEC3,
+            },
+          },
+        });
+        break;
+      case Grayscale.REC_2100:
+        this._effect.pushEffect({
+          effect: Effect.GRAYSCALE_WEIGHT,
+          params: {
+            u_weight: {
+              value: vec3.new(0.2627, 0.678, 0.0593),
+              type: Uniform.FLOAT_VEC3,
+            },
+          },
+        });
+        break;
+      case Grayscale.AVERAGE:
+        this._effect.pushEffect({ effect: Effect.GRAYSCALE_AVERAGE });
+        break;
+      case Grayscale.RGB_R:
+        this._effect.pushEffect({
+          effect: Effect.GRAYSCALE_WEIGHT,
+          params: {
+            u_weight: { value: vec3.new(1, 0, 0), type: Uniform.FLOAT_VEC3 },
+          },
+        });
+        break;
+      case Grayscale.RGB_G:
+        this._effect.pushEffect({
+          effect: Effect.GRAYSCALE_WEIGHT,
+          params: {
+            u_weight: { value: vec3.new(0, 1, 0), type: Uniform.FLOAT_VEC3 },
+          },
+        });
+        break;
+      case Grayscale.RGB_B:
+        this._effect.pushEffect({
+          effect: Effect.GRAYSCALE_WEIGHT,
+          params: {
+            u_weight: { value: vec3.new(0, 0, 1), type: Uniform.FLOAT_VEC3 },
+          },
+        });
+        break;
+      case Grayscale.MANUAL:
+        this._effect.pushEffect({
+          effect: Effect.GRAYSCALE_WEIGHT,
+          params: { u_weight: { value: weights, type: Uniform.FLOAT_VEC3 } },
+        });
+        break;
+      default:
+        throw new Error('Unknown grayscale method');
+    }
+    this._draw();
   }
 
   public saveImage(): void {

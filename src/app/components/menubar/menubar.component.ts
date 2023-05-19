@@ -71,7 +71,7 @@ export class MenubarComponent {
     );
   }
 
-  public get notOpen(): true | null {
+  public get disabled(): true | null {
     return this._editor.status !== EditorStatus.OPEN || null;
   }
 

@@ -79,6 +79,7 @@
   type="button"
   title="Rotate right 90°"
   [disabled]="disabled"
+  (click)="engine?.rotateRight()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faRotateRight"></fa-icon>
@@ -87,6 +88,7 @@
   type="button"
   title="Rotate left 90°"
   [disabled]="disabled"
+  (click)="engine?.rotateLeft()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faRotateLeft"></fa-icon>

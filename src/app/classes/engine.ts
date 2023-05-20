@@ -301,6 +301,32 @@ export class Engine {
     this.setZoom(1);
   }
 
+  public rotateRight(): void {
+    this._effect.pushEffect({
+      effect: Effect.ROTATE,
+      params: {
+        u_view: {
+          type: Uniform.FLOAT_MAT4,
+          value: mat4.rotate(mat4.new(1), -90),
+        },
+      },
+    });
+    this._draw();
+  }
+
+  public rotateLeft(): void {
+    this._effect.pushEffect({
+      effect: Effect.ROTATE,
+      params: {
+        u_view: {
+          type: Uniform.FLOAT_MAT4,
+          value: mat4.rotate(mat4.new(1), 90),
+        },
+      },
+    });
+    this._draw();
+  }
+
   public flipVertical(): void {
     this._effect.pushEffect({ effect: Effect.FLIP_VERTICAL });
     this._draw();

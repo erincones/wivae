@@ -63,10 +63,6 @@ export const vec2 = {
 };
 
 export const vec3 = {
-  zero: (): vec3 => {
-    return new Float32Array(3) as unknown as vec3;
-  },
-
   new: (x: number, y: number, z: number): vec3 => {
     return new Float32Array([x, y, z]) as unknown as vec3;
   },
@@ -129,7 +125,6 @@ export const mat4 = {
   translate: (a: Readonly<mat4>, translation: Readonly<vec2>): mat4 => {
     const x = translation[0];
     const y = translation[1];
-    const z = 0;
     const a0 = a[0];
     const a1 = a[1];
     const a2 = a[2];
@@ -138,10 +133,6 @@ export const mat4 = {
     const a5 = a[5];
     const a6 = a[6];
     const a7 = a[7];
-    const a8 = a[8];
-    const a9 = a[9];
-    const a10 = a[10];
-    const a11 = a[11];
     return new Float32Array([
       a0,
       a1,
@@ -151,14 +142,46 @@ export const mat4 = {
       a5,
       a6,
       a7,
-      a8,
-      a9,
-      a10,
-      a11,
-      a0 * x + a4 * y + a8 * z + a[12],
-      a1 * x + a5 * y + a9 * z + a[13],
-      a2 * x + a6 * y + a10 * z + a[14],
-      a3 * x + a7 * y + a11 * z + a[15],
+      a[8],
+      a[9],
+      a[10],
+      a[11],
+      a0 * x + a4 * y + a[12],
+      a1 * x + a5 * y + a[13],
+      a2 * x + a6 * y + a[14],
+      a3 * x + a7 * y + a[15],
+    ]) as unknown as mat4;
+  },
+
+  rotate: (a: Readonly<mat4>, angle: number): mat4 => {
+    const rad = (angle / 180) * Math.PI;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+    const a0 = a[0];
+    const a1 = a[1];
+    const a2 = a[2];
+    const a3 = a[3];
+    const a4 = a[4];
+    const a5 = a[5];
+    const a6 = a[6];
+    const a7 = a[7];
+    return new Float32Array([
+      a0 * cos + a4 * sin,
+      a1 * cos + a5 * sin,
+      a2 * cos + a6 * sin,
+      a3 * cos + a7 * sin,
+      a4 * cos - a0 * sin,
+      a5 * cos - a1 * sin,
+      a6 * cos - a2 * sin,
+      a7 * cos - a3 * sin,
+      a[8],
+      a[9],
+      a[10],
+      a[11],
+      a[12],
+      a[13],
+      a[14],
+      a[15],
     ]) as unknown as mat4;
   },
 };

@@ -52,10 +52,7 @@ export class EffectStack {
 
   public constructor(gl: WebGL2RenderingContext, image: HTMLImageElement) {
     this._gl = gl;
-    this._source = this._createTexture(
-      WebGL2RenderingContext.NEAREST,
-      WebGL2RenderingContext.LINEAR_MIPMAP_LINEAR
-    );
+    this._source = this._createTexture();
 
     this._gl.pixelStorei(WebGL2RenderingContext.UNPACK_FLIP_Y_WEBGL, true);
     this._gl.texImage2D(
@@ -107,10 +104,7 @@ export class EffectStack {
     return this._to < this._stack.length;
   }
 
-  private _createTexture(
-    magFilter: WebGLFilter = WebGL2RenderingContext.NEAREST,
-    minFilter: WebGLFilter = WebGL2RenderingContext.NEAREST
-  ): WebGLTexture {
+  private _createTexture(): WebGLTexture {
     const texture = this._gl.createTexture();
 
     if (texture === null) throw new Error('Could not create texture');
@@ -130,12 +124,12 @@ export class EffectStack {
     this._gl.texParameteri(
       WebGL2RenderingContext.TEXTURE_2D,
       WebGL2RenderingContext.TEXTURE_MAG_FILTER,
-      magFilter
+      WebGL2RenderingContext.NEAREST
     );
     this._gl.texParameteri(
       WebGL2RenderingContext.TEXTURE_2D,
       WebGL2RenderingContext.TEXTURE_MIN_FILTER,
-      minFilter
+      WebGL2RenderingContext.LINEAR_MIPMAP_NEAREST
     );
 
     return texture;
@@ -240,6 +234,7 @@ export class EffectStack {
     this._from = this._to;
     this.bindFBO();
     this._gl.viewport(0, 0, canvasSize[0], canvasSize[1]);
+    this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
   }
 
   public release(): void {

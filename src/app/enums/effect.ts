@@ -1,5 +1,6 @@
 export enum Effect {
   VIEWER,
+  ROTATE,
   FLIP_VERTICAL,
   FLIP_HORIZONTAL,
   GRAYSCALE_HSL_L,

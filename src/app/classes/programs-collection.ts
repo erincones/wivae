@@ -32,6 +32,10 @@ export class ProgramsCollection {
         shaders.vertex.view,
         shaders.fragment.neutral
       ),
+      [Effect.ROTATE]: this._link(
+        shaders.vertex.rotate,
+        shaders.fragment.neutral
+      ),
       [Effect.FLIP_VERTICAL]: this._link(
         shaders.vertex.flipVertical,
         shaders.fragment.neutral

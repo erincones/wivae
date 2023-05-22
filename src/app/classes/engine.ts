@@ -96,6 +96,17 @@ export class Engine {
     return position;
   }
 
+  private _updateRatio(): void {
+    this._ratio = vec2.div(this._imageSize, this._canvasSize);
+    const maxRatio = vec2.max(this._ratio);
+    this._minZoom = maxRatio <= 1 ? 1 : 1 / maxRatio;
+
+    if (this._zoom < this._minZoom) this._zoom = this._minZoom;
+    if (this._fitted) this._zoom = this._minZoom;
+
+    this._updateView();
+  }
+
   private _updateView(): void {
     this._program.use(Effect.VIEWER);
     this._gl.uniformMatrix4fv(
@@ -106,8 +117,6 @@ export class Engine {
         this._position
       )
     );
-
-    this._draw();
   }
 
   private _drawEffect(data: EffectData): void {
@@ -144,6 +153,7 @@ export class Engine {
         }
       });
 
+    this._gl.viewport(0, 0, data.resolution[0], data.resolution[1]);
     this._gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
     this._gl.drawElements(
       WebGL2RenderingContext.TRIANGLE_STRIP,
@@ -154,12 +164,18 @@ export class Engine {
   }
 
   private _draw(): void {
-    this._effect.traverse(
-      this._imageSize,
-      this._canvasSize,
-      this._drawEffect.bind(this)
-    );
-    this._drawEffect({ effect: Effect.VIEWER });
+    const res =
+      this._effect.traverse(this._drawEffect.bind(this)) ||
+      vec2.new(this._image.width, this._image.height);
+
+    if (!vec2.equals(res, this._imageSize)) {
+      this._imageSize = res;
+      this._updateRatio();
+    }
+
+    this._effect.bindFBO();
+    this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
+    this._drawEffect({ effect: Effect.VIEWER, resolution: this._canvasSize });
   }
 
   public get file(): File {
@@ -248,15 +264,8 @@ export class Engine {
     if (vec2.equals(this._canvasSize, canvasSize)) return;
 
     this._canvasSize = canvasSize;
-    this._ratio = vec2.div(this._imageSize, this._canvasSize);
-    const maxRatio = vec2.max(this._ratio);
-    this._minZoom = maxRatio <= 1 ? 1 : 1 / maxRatio;
-
-    if (this._zoom < this._minZoom) this._zoom = this._minZoom;
-    if (this._fitted) this._zoom = this._minZoom;
-
-    this._gl.viewport(0, 0, this._canvasSize[0], this._canvasSize[1]);
-    this._updateView();
+    this._updateRatio();
+    this._draw();
   }
 
   public translate(movement: vec2): void {
@@ -265,6 +274,7 @@ export class Engine {
     if (!vec2.equals(position, this._position)) {
       this._position = position;
       this._updateView();
+      this._draw();
     }
   }
 
@@ -281,6 +291,7 @@ export class Engine {
         vec2.sub(source, this._projectPoint(target))
       );
       this._updateView();
+      this._draw();
     }
   }
 
@@ -304,6 +315,7 @@ export class Engine {
   public rotateRight(): void {
     this._effect.pushEffect({
       effect: Effect.ROTATE,
+      resolution: vec2.new(this._imageSize[1], this._imageSize[0]),
       params: {
         u_view: {
           type: Uniform.FLOAT_MAT4,
@@ -317,6 +329,7 @@ export class Engine {
   public rotateLeft(): void {
     this._effect.pushEffect({
       effect: Effect.ROTATE,
+      resolution: vec2.new(this._imageSize[1], this._imageSize[0]),
       params: {
         u_view: {
           type: Uniform.FLOAT_MAT4,
@@ -328,98 +341,83 @@ export class Engine {
   }
 
   public flipVertical(): void {
-    this._effect.pushEffect({ effect: Effect.FLIP_VERTICAL });
+    this._effect.pushEffect({
+      effect: Effect.FLIP_VERTICAL,
+      resolution: this._imageSize,
+    });
     this._draw();
   }
 
   public flipHorizontal(): void {
-    this._effect.pushEffect({ effect: Effect.FLIP_HORIZONTAL });
+    this._effect.pushEffect({
+      effect: Effect.FLIP_HORIZONTAL,
+      resolution: this._imageSize,
+    });
     this._draw();
   }
 
   public grayscale(
     type: Grayscale,
-    weights = vec3.new(1 / 3, 1 / 3, 1 / 3)
+    weights: vec3 = vec3.new(1 / 3, 1 / 3, 1 / 3)
   ): void {
+    let effect: Effect;
+    let weight: vec3 | undefined;
+
     switch (type) {
       case Grayscale.HSL_L:
-        this._effect.pushEffect({ effect: Effect.GRAYSCALE_HSL_L });
+        effect = Effect.GRAYSCALE_HSL_L;
         break;
       case Grayscale.HSV_V:
-        this._effect.pushEffect({ effect: Effect.GRAYSCALE_HSV_V });
+        effect = Effect.GRAYSCALE_HSV_V;
         break;
       case Grayscale.CIELAB_L:
-        this._effect.pushEffect({ effect: Effect.GRAYSCALE_CIELAB_L });
+        effect = Effect.GRAYSCALE_CIELAB_L;
         break;
       case Grayscale.REC_601:
-        this._effect.pushEffect({
-          effect: Effect.GRAYSCALE_WEIGHT,
-          params: {
-            u_weight: {
-              value: vec3.new(0.299, 0.587, 0.114),
-              type: Uniform.FLOAT_VEC3,
-            },
-          },
-        });
+        effect = Effect.GRAYSCALE_WEIGHT;
+        weight = vec3.new(0.299, 0.587, 0.114);
         break;
       case Grayscale.REC_709:
-        this._effect.pushEffect({
-          effect: Effect.GRAYSCALE_WEIGHT,
-          params: {
-            u_weight: {
-              value: vec3.new(0.2126, 0.7152, 0.0722),
-              type: Uniform.FLOAT_VEC3,
-            },
-          },
-        });
+        effect = Effect.GRAYSCALE_WEIGHT;
+        weight = vec3.new(0.2126, 0.7152, 0.0722);
         break;
       case Grayscale.REC_2100:
-        this._effect.pushEffect({
-          effect: Effect.GRAYSCALE_WEIGHT,
-          params: {
-            u_weight: {
-              value: vec3.new(0.2627, 0.678, 0.0593),
-              type: Uniform.FLOAT_VEC3,
-            },
-          },
-        });
+        effect = Effect.GRAYSCALE_WEIGHT;
+        weight = vec3.new(0.2627, 0.678, 0.0593);
         break;
       case Grayscale.AVERAGE:
-        this._effect.pushEffect({ effect: Effect.GRAYSCALE_AVERAGE });
+        effect = Effect.GRAYSCALE_AVERAGE;
         break;
       case Grayscale.RGB_R:
-        this._effect.pushEffect({
-          effect: Effect.GRAYSCALE_WEIGHT,
-          params: {
-            u_weight: { value: vec3.new(1, 0, 0), type: Uniform.FLOAT_VEC3 },
-          },
-        });
+        effect = Effect.GRAYSCALE_WEIGHT;
+        weight = vec3.new(1, 0, 0);
         break;
       case Grayscale.RGB_G:
-        this._effect.pushEffect({
-          effect: Effect.GRAYSCALE_WEIGHT,
-          params: {
-            u_weight: { value: vec3.new(0, 1, 0), type: Uniform.FLOAT_VEC3 },
-          },
-        });
+        effect = Effect.GRAYSCALE_WEIGHT;
+        weight = vec3.new(0, 1, 0);
         break;
       case Grayscale.RGB_B:
-        this._effect.pushEffect({
-          effect: Effect.GRAYSCALE_WEIGHT,
-          params: {
-            u_weight: { value: vec3.new(0, 0, 1), type: Uniform.FLOAT_VEC3 },
-          },
-        });
+        effect = Effect.GRAYSCALE_WEIGHT;
+        weight = vec3.new(0, 0, 1);
         break;
       case Grayscale.MANUAL:
-        this._effect.pushEffect({
-          effect: Effect.GRAYSCALE_WEIGHT,
-          params: { u_weight: { value: weights, type: Uniform.FLOAT_VEC3 } },
-        });
+        effect = Effect.GRAYSCALE_WEIGHT;
+        weight = weights;
         break;
       default:
         throw new Error('Unknown grayscale method');
     }
+
+    this._effect.pushEffect({
+      effect,
+      resolution: this._imageSize,
+      params: weight && {
+        u_weight: {
+          type: Uniform.FLOAT_VEC3,
+          value: weight,
+        },
+      },
+    });
     this._draw();
   }
 

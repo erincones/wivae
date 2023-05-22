@@ -2,14 +2,6 @@ import { Effect } from '../enums/effect';
 import { Uniform } from '../enums/uniform';
 import { mat4, vec2, vec3 } from '../libs/lar';
 
-type WebGLFilter = WebGL2RenderingContext[
-  | 'NEAREST'
-  | 'LINEAR'
-  | 'NEAREST_MIPMAP_NEAREST'
-  | 'NEAREST_MIPMAP_LINEAR'
-  | 'LINEAR_MIPMAP_NEAREST'
-  | 'LINEAR_MIPMAP_LINEAR'];
-
 type EffectParam =
   | {
       readonly type: Uniform.FLOAT;
@@ -25,11 +17,12 @@ type EffectParam =
     }
   | {
       readonly type: Uniform.FLOAT_ARRAY;
-      readonly value: Readonly<Float32Array>;
+      readonly value: Float32Array;
     };
 
 export interface EffectData {
   readonly effect: Effect;
+  readonly resolution: vec2;
   readonly params?: Readonly<Record<string, EffectParam>>;
 }
 
@@ -37,6 +30,8 @@ export class EffectStack {
   private _gl: WebGL2RenderingContext;
 
   private _source: WebGLTexture;
+
+  private _resolution: vec2[];
 
   private _texture: WebGLTexture[];
 
@@ -66,10 +61,12 @@ export class EffectStack {
     this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
     this._gl.pixelStorei(WebGL2RenderingContext.UNPACK_FLIP_Y_WEBGL, false);
 
+    this._resolution = [];
     this._texture = [];
     this._fbo = [];
     for (let i = 0; i < 2; ++i) {
       const texture = this._createTexture();
+      this._resolution.push(vec2.new(image.width, image.width));
       this._texture.push(texture);
       this._gl.texImage2D(
         WebGL2RenderingContext.TEXTURE_2D,
@@ -165,6 +162,30 @@ export class EffectStack {
     );
   }
 
+  private _resizeTexture(i: number, resolution: vec2): void {
+    if (vec2.equals(resolution, this._resolution[i])) return;
+
+    const current: WebGLTexture = this._gl.getParameter(
+      WebGL2RenderingContext.TEXTURE_BINDING_2D
+    );
+
+    this.bindTexture(i);
+    this._gl.texImage2D(
+      WebGL2RenderingContext.TEXTURE_2D,
+      0,
+      WebGL2RenderingContext.RGBA,
+      resolution[0],
+      resolution[1],
+      0,
+      WebGL2RenderingContext.RGBA,
+      WebGL2RenderingContext.UNSIGNED_BYTE,
+      null
+    );
+    this._gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, current);
+
+    this._resolution[i] = resolution;
+  }
+
   public bindFBO(i: number | null = null): void {
     this._gl.bindFramebuffer(
       WebGL2RenderingContext.FRAMEBUFFER,
@@ -207,34 +228,32 @@ export class EffectStack {
     return false;
   }
 
-  public traverse(
-    imageSize: vec2,
-    canvasSize: vec2,
-    callBack: (data: EffectData) => void
-  ): void {
+  public traverse(callBack: (data: EffectData) => void): vec2 | undefined {
     if (this._untraversed) {
       this.bindTexture();
       this.bindFBO();
       this._untraversed = false;
-      return;
+      return undefined;
+    }
+    if (this._stack.length === 0) return undefined;
+    if (this._from !== this._to) {
+      if (this._from === 0) this.bindTexture();
+
+      for (let i = this._from; i < this._to; ++i) {
+        const curr = i & 1;
+        const effect = this._stack[i];
+        this.bindFBO(curr);
+        this._resizeTexture(curr, effect.resolution);
+        callBack(effect);
+        this.bindTexture(curr);
+      }
+
+      this._from = this._to;
+      this.bindFBO();
+      this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
     }
 
-    if (this._stack.length === 0 || this._from === this._to) return;
-
-    this._gl.viewport(0, 0, imageSize[0], imageSize[1]);
-    if (this._from === 0) this.bindTexture();
-
-    for (let i = this._from; i < this._to; ++i) {
-      const curr = i & 1;
-      this.bindFBO(curr);
-      callBack(this._stack[i]);
-      this.bindTexture(curr);
-    }
-
-    this._from = this._to;
-    this.bindFBO();
-    this._gl.viewport(0, 0, canvasSize[0], canvasSize[1]);
-    this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
+    return this._stack[this._to - 1].resolution;
   }
 
   public release(): void {

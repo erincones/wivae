@@ -170,6 +170,7 @@ export class Engine {
 
     if (!vec2.equals(res, this._imageSize)) {
       this._imageSize = res;
+      this._position = this._translatePosition(vec2.zero());
       this._updateRatio();
     }
 

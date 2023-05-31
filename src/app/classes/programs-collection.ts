@@ -56,13 +56,29 @@ export class ProgramsCollection {
         shaders.vertex.neutral,
         shaders.fragment.grayscaleCIELAB
       ),
-      [Effect.GRAYSCALE_AVERAGE]: this._link(
-        shaders.vertex.neutral,
-        shaders.fragment.grayscaleAVG
-      ),
       [Effect.GRAYSCALE_WEIGHT]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.grayscaleWeight
+      ),
+      [Effect.INVERT_R]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.invertR
+      ),
+      [Effect.INVERT_G]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.invertG
+      ),
+      [Effect.INVERT_B]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.invertB
+      ),
+      [Effect.INVERT_RGB]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.invertRGB
+      ),
+      [Effect.INVERT_LIGHTNESS]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.invertLightness
       ),
     };
 

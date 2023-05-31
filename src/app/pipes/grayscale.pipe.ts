@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Engine } from '../classes/engine';
-import { Grayscale } from '../enums/grayscale';
 
 interface GrayscaleMethod {
   name: string;
@@ -29,36 +28,16 @@ export class GrayscalePipe implements PipeTransform {
     ];
 
     if (engine !== undefined) {
-      methods[0].method = () => {
-        engine.grayscale(Grayscale.HSL_L);
-      };
-      methods[1].method = () => {
-        engine.grayscale(Grayscale.HSV_V);
-      };
-      methods[2].method = () => {
-        engine.grayscale(Grayscale.CIELAB_L);
-      };
-      methods[3].method = () => {
-        engine.grayscale(Grayscale.REC_601);
-      };
-      methods[4].method = () => {
-        engine.grayscale(Grayscale.REC_709);
-      };
-      methods[5].method = () => {
-        engine.grayscale(Grayscale.REC_2100);
-      };
-      methods[6].method = () => {
-        engine.grayscale(Grayscale.AVERAGE);
-      };
-      methods[7].method = () => {
-        engine.grayscale(Grayscale.RGB_R);
-      };
-      methods[8].method = () => {
-        engine.grayscale(Grayscale.RGB_G);
-      };
-      methods[9].method = () => {
-        engine.grayscale(Grayscale.RGB_B);
-      };
+      methods[0].method = engine.grayscaleHSL.bind(engine);
+      methods[1].method = engine.grayscaleHSV.bind(engine);
+      methods[2].method = engine.grayscaleCIELAB.bind(engine);
+      methods[3].method = engine.grayscaleREC601.bind(engine);
+      methods[4].method = engine.grayscaleREC709.bind(engine);
+      methods[5].method = engine.grayscaleREC2100.bind(engine);
+      methods[6].method = engine.grayscaleAVG.bind(engine);
+      methods[7].method = engine.grayscaleR.bind(engine);
+      methods[8].method = engine.grayscaleG.bind(engine);
+      methods[9].method = engine.grayscaleB.bind(engine);
     }
 
     return methods;

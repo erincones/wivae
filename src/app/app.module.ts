@@ -20,6 +20,8 @@ import { GrayscaleComponent } from './components/toolbar/grayscale/grayscale.com
 import { FileInfoPipe } from './pipes/file-info.pipe';
 import { SummaryPipe } from './pipes/summary.pipe';
 import { GrayscalePipe } from './pipes/grayscale.pipe';
+import { InvertComponent } from './components/toolbar/invert/invert.component';
+import { InvertPipe } from './pipes/invert.pipe';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,8 @@ import { GrayscalePipe } from './pipes/grayscale.pipe';
     FileInfoPipe,
     SummaryPipe,
     GrayscalePipe,
+    InvertComponent,
+    InvertPipe,
   ],
   imports: [BrowserModule, AppRoutingModule, FontAwesomeModule],
   providers: [],

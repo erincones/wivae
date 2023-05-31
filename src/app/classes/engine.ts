@@ -1,5 +1,4 @@
 import { Effect } from '../enums/effect';
-import { Grayscale } from '../enums/grayscale';
 import { Uniform } from '../enums/uniform';
 import { mat4, vec2, vec3 } from '../libs/lar';
 import { EffectData, EffectStack } from './effect-stack';
@@ -357,67 +356,178 @@ export class Engine {
     this._draw();
   }
 
-  public grayscale(
-    type: Grayscale,
-    weights: vec3 = vec3.new(1 / 3, 1 / 3, 1 / 3)
-  ): void {
-    let effect: Effect;
-    let weight: vec3 | undefined;
-
-    switch (type) {
-      case Grayscale.HSL_L:
-        effect = Effect.GRAYSCALE_HSL_L;
-        break;
-      case Grayscale.HSV_V:
-        effect = Effect.GRAYSCALE_HSV_V;
-        break;
-      case Grayscale.CIELAB_L:
-        effect = Effect.GRAYSCALE_CIELAB_L;
-        break;
-      case Grayscale.REC_601:
-        effect = Effect.GRAYSCALE_WEIGHT;
-        weight = vec3.new(0.299, 0.587, 0.114);
-        break;
-      case Grayscale.REC_709:
-        effect = Effect.GRAYSCALE_WEIGHT;
-        weight = vec3.new(0.2126, 0.7152, 0.0722);
-        break;
-      case Grayscale.REC_2100:
-        effect = Effect.GRAYSCALE_WEIGHT;
-        weight = vec3.new(0.2627, 0.678, 0.0593);
-        break;
-      case Grayscale.AVERAGE:
-        effect = Effect.GRAYSCALE_AVERAGE;
-        break;
-      case Grayscale.RGB_R:
-        effect = Effect.GRAYSCALE_WEIGHT;
-        weight = vec3.new(1, 0, 0);
-        break;
-      case Grayscale.RGB_G:
-        effect = Effect.GRAYSCALE_WEIGHT;
-        weight = vec3.new(0, 1, 0);
-        break;
-      case Grayscale.RGB_B:
-        effect = Effect.GRAYSCALE_WEIGHT;
-        weight = vec3.new(0, 0, 1);
-        break;
-      case Grayscale.MANUAL:
-        effect = Effect.GRAYSCALE_WEIGHT;
-        weight = weights;
-        break;
-      default:
-        throw new Error('Unknown grayscale method');
-    }
-
+  public grayscaleHSL(): void {
     this._effect.pushEffect({
-      effect,
+      effect: Effect.GRAYSCALE_HSL_L,
       resolution: this._imageSize,
-      params: weight && {
+    });
+    this._draw();
+  }
+
+  public grayscaleHSV(): void {
+    this._effect.pushEffect({
+      effect: Effect.GRAYSCALE_HSL_L,
+      resolution: this._imageSize,
+    });
+    this._draw();
+  }
+
+  public grayscaleCIELAB(): void {
+    this._effect.pushEffect({
+      effect: Effect.GRAYSCALE_CIELAB_L,
+      resolution: this._imageSize,
+    });
+    this._draw();
+  }
+
+  public grayscaleREC601(): void {
+    this._effect.pushEffect({
+      effect: Effect.GRAYSCALE_WEIGHT,
+      resolution: this._imageSize,
+      params: {
         u_weight: {
           type: Uniform.FLOAT_VEC3,
-          value: weight,
+          value: vec3.new(0.299, 0.587, 0.114),
         },
       },
+    });
+    this._draw();
+  }
+
+  public grayscaleREC709(): void {
+    this._effect.pushEffect({
+      effect: Effect.GRAYSCALE_WEIGHT,
+      resolution: this._imageSize,
+      params: {
+        u_weight: {
+          type: Uniform.FLOAT_VEC3,
+          value: vec3.new(0.2126, 0.7152, 0.0722),
+        },
+      },
+    });
+    this._draw();
+  }
+
+  public grayscaleREC2100(): void {
+    this._effect.pushEffect({
+      effect: Effect.GRAYSCALE_WEIGHT,
+      resolution: this._imageSize,
+      params: {
+        u_weight: {
+          type: Uniform.FLOAT_VEC3,
+          value: vec3.new(0.2627, 0.678, 0.0593),
+        },
+      },
+    });
+    this._draw();
+  }
+
+  public grayscaleAVG(): void {
+    this._effect.pushEffect({
+      effect: Effect.GRAYSCALE_WEIGHT,
+      resolution: this._imageSize,
+      params: {
+        u_weight: {
+          type: Uniform.FLOAT_VEC3,
+          value: vec3.new(1 / 3, 1 / 3, 1 / 3),
+        },
+      },
+    });
+    this._draw();
+  }
+
+  public grayscaleR(): void {
+    this._effect.pushEffect({
+      effect: Effect.GRAYSCALE_WEIGHT,
+      resolution: this._imageSize,
+      params: {
+        u_weight: {
+          type: Uniform.FLOAT_VEC3,
+          value: vec3.new(1, 0, 0),
+        },
+      },
+    });
+    this._draw();
+  }
+
+  public grayscaleG(): void {
+    this._effect.pushEffect({
+      effect: Effect.GRAYSCALE_WEIGHT,
+      resolution: this._imageSize,
+      params: {
+        u_weight: {
+          type: Uniform.FLOAT_VEC3,
+          value: vec3.new(0, 1, 0),
+        },
+      },
+    });
+    this._draw();
+  }
+
+  public grayscaleB(): void {
+    this._effect.pushEffect({
+      effect: Effect.GRAYSCALE_WEIGHT,
+      resolution: this._imageSize,
+      params: {
+        u_weight: {
+          type: Uniform.FLOAT_VEC3,
+          value: vec3.new(0, 0, 1),
+        },
+      },
+    });
+    this._draw();
+  }
+
+  public grayscaleManual(weights: vec3): void {
+    this._effect.pushEffect({
+      effect: Effect.GRAYSCALE_WEIGHT,
+      resolution: this._imageSize,
+      params: {
+        u_weight: {
+          type: Uniform.FLOAT_VEC3,
+          value: weights,
+        },
+      },
+    });
+    this._draw();
+  }
+
+  public invertR(): void {
+    this._effect.pushEffect({
+      effect: Effect.INVERT_R,
+      resolution: this._imageSize,
+    });
+    this._draw();
+  }
+
+  public invertG(): void {
+    this._effect.pushEffect({
+      effect: Effect.INVERT_G,
+      resolution: this._imageSize,
+    });
+    this._draw();
+  }
+
+  public invertB(): void {
+    this._effect.pushEffect({
+      effect: Effect.INVERT_B,
+      resolution: this._imageSize,
+    });
+    this._draw();
+  }
+
+  public invertRGB(): void {
+    this._effect.pushEffect({
+      effect: Effect.INVERT_RGB,
+      resolution: this._imageSize,
+    });
+    this._draw();
+  }
+
+  public invertLightness(): void {
+    this._effect.pushEffect({
+      effect: Effect.INVERT_LIGHTNESS,
+      resolution: this._imageSize,
     });
     this._draw();
   }

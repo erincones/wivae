@@ -1,0 +1,14 @@
+<wivae-section name="Invert">
+  <ul class="mb-2 columns-2">
+    <li *ngFor="let method of editor.engine | invert">
+      <button
+        type="button"
+        class="mb-1 w-full bg-slate-200 font-semibold hover:bg-blue-300 active:bg-blue-400"
+        [disabled]="disabled"
+        (click)="method.method()"
+      >
+        {{ method.name }}
+      </button>
+    </li>
+  </ul>
+</wivae-section>

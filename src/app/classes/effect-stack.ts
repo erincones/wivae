@@ -246,11 +246,11 @@ export class EffectStack {
         this._resizeTexture(curr, effect.resolution);
         callBack(effect);
         this.bindTexture(curr);
+        this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
       }
 
       this._from = this._to;
       this.bindFBO();
-      this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
     }
 
     return this._stack[this._to - 1].resolution;

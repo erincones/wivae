@@ -32,12 +32,12 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     private _gui: GUIService,
     private _editor: EditorService
   ) {
-    this._observer = new ResizeObserver(this._resizeViewport.bind(this));
+    this._observer = new ResizeObserver(this._updateCanvasSize.bind(this));
     this._moving = false;
   }
 
   @HostListener('window:resize')
-  private _resizeViewport(): void {
+  private _updateCanvasSize(): void {
     const engine = this._editor.engine;
 
     if (engine === undefined) return;
@@ -55,7 +55,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     canvas.width = width * devicePixelRatio;
     canvas.height = height * devicePixelRatio;
 
-    engine.resizeViewport();
+    engine.updateCanvasSize();
   }
 
   @HostListener('window:mousemove', ['$event'])
@@ -82,7 +82,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
   public ngAfterViewInit(): void {
     try {
       this._editor.engine?.setup(this._canvas.nativeElement);
-      this._resizeViewport();
+      this._updateCanvasSize();
     } catch (e) {
       this._gui.pushAlert(
         new Alert(AlertType.ERROR, e instanceof Error ? e.message : String(e))

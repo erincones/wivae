@@ -259,7 +259,7 @@ export class Engine {
     this._gl.uniform1i(this._program.getUniformLocation('u_img'), 0);
   }
 
-  public resizeViewport(): void {
+  public updateCanvasSize(): void {
     const canvasSize = vec2.new(this._canvas.width, this._canvas.height);
     if (vec2.equals(this._canvasSize, canvasSize)) return;
 
@@ -549,7 +549,7 @@ export class Engine {
     this._canvas.height = this._imageSize[1];
     this._position = vec2.zero();
     this._zoom = 1;
-    this.resizeViewport();
+    this.updateCanvasSize();
 
     this._canvas.toBlob((blob) => {
       if (blob === null) return;
@@ -568,7 +568,7 @@ export class Engine {
     this._canvas.height = canvasSize[1];
     this._position = position;
     this._zoom = zoom;
-    this.resizeViewport();
+    this.updateCanvasSize();
   }
 
   public release(): void {

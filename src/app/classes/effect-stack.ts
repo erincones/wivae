@@ -253,7 +253,7 @@ export class EffectStack {
       this.bindFBO();
     }
 
-    return this._stack[this._to - 1].resolution;
+    return this._to ? this._stack[this._to - 1].resolution : undefined;
   }
 
   public release(): void {

@@ -1,4 +1,5 @@
 import { Effect } from '../enums/effect';
+import { Program } from '../enums/program';
 import { Uniform } from '../enums/uniform';
 import { mat4, vec2, vec3 } from '../libs/lar';
 import { EffectData, EffectStack } from './effect-stack';
@@ -107,7 +108,7 @@ export class Engine {
   }
 
   private _updateView(): void {
-    this._program.use(Effect.VIEWER);
+    this._program.use(Program.VIEWER);
     this._gl.uniformMatrix4fv(
       this._program.getUniformLocation('u_view'),
       false,
@@ -119,7 +120,7 @@ export class Engine {
   }
 
   private _drawEffect(data: EffectData): void {
-    this._program.use(data.effect);
+    this._program.use(data.program);
 
     if (data.params)
       Object.entries(data.params).forEach(([name, param]) => {
@@ -163,19 +164,15 @@ export class Engine {
   }
 
   private _draw(): void {
-    const res =
-      this._effect.traverse(this._drawEffect.bind(this)) ||
-      vec2.new(this._image.width, this._image.height);
+    const imageSize = this._effect.traverse(this._drawEffect.bind(this));
 
-    if (!vec2.equals(res, this._imageSize)) {
-      this._imageSize = res;
+    if (!vec2.equals(imageSize, this._imageSize)) {
+      this._imageSize = imageSize;
       this._position = this._translatePosition(vec2.zero());
       this._updateRatio();
     }
 
-    this._effect.bindFBO();
-    this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
-    this._drawEffect({ effect: Effect.VIEWER, resolution: this._canvasSize });
+    this._drawEffect({ program: Program.VIEWER, resolution: this._canvasSize });
   }
 
   public get file(): File {
@@ -255,7 +252,7 @@ export class Engine {
 
     this._effect = new EffectStack(this._gl, this._image);
 
-    this._program.use(Effect.VIEWER);
+    this._program.use(Program.VIEWER);
     this._gl.uniform1i(this._program.getUniformLocation('u_img'), 0);
   }
 
@@ -312,223 +309,136 @@ export class Engine {
     this.setZoom(1);
   }
 
-  public rotateRight(): void {
-    this._effect.pushEffect({
-      effect: Effect.ROTATE,
-      resolution: vec2.new(this._imageSize[1], this._imageSize[0]),
-      params: {
-        u_view: {
-          type: Uniform.FLOAT_MAT4,
-          value: mat4.rotate(mat4.new(1), -90),
-        },
-      },
-    });
-    this._draw();
-  }
+  public apply(effect: Effect, params?: EffectData['params']): void {
+    let resolution: vec2 | undefined;
+    let program: Program;
 
-  public rotateLeft(): void {
-    this._effect.pushEffect({
-      effect: Effect.ROTATE,
-      resolution: vec2.new(this._imageSize[1], this._imageSize[0]),
-      params: {
-        u_view: {
-          type: Uniform.FLOAT_MAT4,
-          value: mat4.rotate(mat4.new(1), 90),
-        },
-      },
-    });
-    this._draw();
-  }
+    switch (effect) {
+      case Effect.ROTATE_90:
+        program = Program.ROTATE;
+        resolution = vec2.new(this._imageSize[1], this._imageSize[0]);
+        params = {
+          u_view: {
+            type: Uniform.FLOAT_MAT4,
+            value: mat4.rotate(mat4.new(1), -90),
+          },
+        };
+        break;
+      case Effect.ROTATE_270:
+        program = Program.ROTATE;
+        resolution = vec2.new(this._imageSize[1], this._imageSize[0]);
+        params = {
+          u_view: {
+            type: Uniform.FLOAT_MAT4,
+            value: mat4.rotate(mat4.new(1), 90),
+          },
+        };
+        break;
+      case Effect.ROTATE_MANUAL:
+        program = Program.ROTATE;
+        break;
+      case Effect.FLIP_VERTICAL:
+        program = Program.FLIP_VERTICAL;
+        break;
+      case Effect.FLIP_HORIZONTAL:
+        program = Program.FLIP_HORIZONTAL;
+        break;
+      case Effect.GRAYSCALE_HSL_L:
+        program = Program.GRAYSCALE_HSL_L;
+        break;
+      case Effect.GRAYSCALE_HSV_V:
+        program = Program.GRAYSCALE_HSV_V;
+        break;
+      case Effect.GRAYSCALE_CIELAB_L:
+        program = Program.GRAYSCALE_CIELAB_L;
+        break;
+      case Effect.GRAYSCALE_REC_601:
+        program = Program.GRAYSCALE_WEIGHT;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0.299, 0.587, 0.114),
+          },
+        };
+        break;
+      case Effect.GRAYSCALE_REC_709:
+        program = Program.GRAYSCALE_WEIGHT;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0.2126, 0.7152, 0.0722),
+          },
+        };
+        break;
+      case Effect.GRAYSCALE_REC_2100:
+        program = Program.GRAYSCALE_WEIGHT;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0.2627, 0.678, 0.0593),
+          },
+        };
+        break;
+      case Effect.GRAYSCALE_AVG:
+        program = Program.GRAYSCALE_WEIGHT;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(1 / 3, 1 / 3, 1 / 3),
+          },
+        };
+        break;
+      case Effect.GRAYSCALE_R:
+        program = Program.GRAYSCALE_WEIGHT;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(1, 0, 0),
+          },
+        };
+        break;
+      case Effect.GRAYSCALE_G:
+        program = Program.GRAYSCALE_WEIGHT;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0, 1, 0),
+          },
+        };
+        break;
+      case Effect.GRAYSCALE_B:
+        program = Program.GRAYSCALE_WEIGHT;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0, 0, 1),
+          },
+        };
+        break;
+      case Effect.GRAYSCALE_MANUAL:
+        program = Program.GRAYSCALE_WEIGHT;
+        break;
+      case Effect.INVERT_R:
+        program = Program.INVERT_R;
+        break;
+      case Effect.INVERT_G:
+        program = Program.INVERT_G;
+        break;
+      case Effect.INVERT_B:
+        program = Program.INVERT_B;
+        break;
+      case Effect.INVERT_RGB:
+        program = Program.INVERT_RGB;
+        break;
+      case Effect.INVERT_LIGHTNESS:
+        program = Program.INVERT_LIGHTNESS;
+        break;
+      default:
+        program = Program.VIEWER;
+    }
 
-  public flipVertical(): void {
-    this._effect.pushEffect({
-      effect: Effect.FLIP_VERTICAL,
-      resolution: this._imageSize,
-    });
-    this._draw();
-  }
-
-  public flipHorizontal(): void {
-    this._effect.pushEffect({
-      effect: Effect.FLIP_HORIZONTAL,
-      resolution: this._imageSize,
-    });
-    this._draw();
-  }
-
-  public grayscaleHSL(): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_HSL_L,
-      resolution: this._imageSize,
-    });
-    this._draw();
-  }
-
-  public grayscaleHSV(): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_HSL_L,
-      resolution: this._imageSize,
-    });
-    this._draw();
-  }
-
-  public grayscaleCIELAB(): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_CIELAB_L,
-      resolution: this._imageSize,
-    });
-    this._draw();
-  }
-
-  public grayscaleREC601(): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_WEIGHT,
-      resolution: this._imageSize,
-      params: {
-        u_weight: {
-          type: Uniform.FLOAT_VEC3,
-          value: vec3.new(0.299, 0.587, 0.114),
-        },
-      },
-    });
-    this._draw();
-  }
-
-  public grayscaleREC709(): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_WEIGHT,
-      resolution: this._imageSize,
-      params: {
-        u_weight: {
-          type: Uniform.FLOAT_VEC3,
-          value: vec3.new(0.2126, 0.7152, 0.0722),
-        },
-      },
-    });
-    this._draw();
-  }
-
-  public grayscaleREC2100(): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_WEIGHT,
-      resolution: this._imageSize,
-      params: {
-        u_weight: {
-          type: Uniform.FLOAT_VEC3,
-          value: vec3.new(0.2627, 0.678, 0.0593),
-        },
-      },
-    });
-    this._draw();
-  }
-
-  public grayscaleAVG(): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_WEIGHT,
-      resolution: this._imageSize,
-      params: {
-        u_weight: {
-          type: Uniform.FLOAT_VEC3,
-          value: vec3.new(1 / 3, 1 / 3, 1 / 3),
-        },
-      },
-    });
-    this._draw();
-  }
-
-  public grayscaleR(): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_WEIGHT,
-      resolution: this._imageSize,
-      params: {
-        u_weight: {
-          type: Uniform.FLOAT_VEC3,
-          value: vec3.new(1, 0, 0),
-        },
-      },
-    });
-    this._draw();
-  }
-
-  public grayscaleG(): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_WEIGHT,
-      resolution: this._imageSize,
-      params: {
-        u_weight: {
-          type: Uniform.FLOAT_VEC3,
-          value: vec3.new(0, 1, 0),
-        },
-      },
-    });
-    this._draw();
-  }
-
-  public grayscaleB(): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_WEIGHT,
-      resolution: this._imageSize,
-      params: {
-        u_weight: {
-          type: Uniform.FLOAT_VEC3,
-          value: vec3.new(0, 0, 1),
-        },
-      },
-    });
-    this._draw();
-  }
-
-  public grayscaleManual(weights: vec3): void {
-    this._effect.pushEffect({
-      effect: Effect.GRAYSCALE_WEIGHT,
-      resolution: this._imageSize,
-      params: {
-        u_weight: {
-          type: Uniform.FLOAT_VEC3,
-          value: weights,
-        },
-      },
-    });
-    this._draw();
-  }
-
-  public invertR(): void {
-    this._effect.pushEffect({
-      effect: Effect.INVERT_R,
-      resolution: this._imageSize,
-    });
-    this._draw();
-  }
-
-  public invertG(): void {
-    this._effect.pushEffect({
-      effect: Effect.INVERT_G,
-      resolution: this._imageSize,
-    });
-    this._draw();
-  }
-
-  public invertB(): void {
-    this._effect.pushEffect({
-      effect: Effect.INVERT_B,
-      resolution: this._imageSize,
-    });
-    this._draw();
-  }
-
-  public invertRGB(): void {
-    this._effect.pushEffect({
-      effect: Effect.INVERT_RGB,
-      resolution: this._imageSize,
-    });
-    this._draw();
-  }
-
-  public invertLightness(): void {
-    this._effect.pushEffect({
-      effect: Effect.INVERT_LIGHTNESS,
-      resolution: this._imageSize,
-    });
+    resolution = resolution || this._imageSize;
+    this._effect.pushEffect({ program, resolution, params });
     this._draw();
   }
 

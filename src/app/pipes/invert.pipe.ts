@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Engine } from '../classes/engine';
+import { Effect } from '../enums/effect';
 
 interface InvertMethod {
   name: string;
@@ -21,11 +22,15 @@ export class InvertPipe implements PipeTransform {
     ];
 
     if (engine !== undefined) {
-      methods[0].method = engine.invertR.bind(engine);
-      methods[1].method = engine.invertG.bind(engine);
-      methods[2].method = engine.invertB.bind(engine);
-      methods[3].method = engine.invertRGB.bind(engine);
-      methods[4].method = engine.invertLightness.bind(engine);
+      const invert = (effect: Effect) => () => {
+        engine.apply(effect);
+      };
+
+      methods[0].method = invert(Effect.INVERT_R);
+      methods[1].method = invert(Effect.INVERT_G);
+      methods[2].method = invert(Effect.INVERT_B);
+      methods[3].method = invert(Effect.INVERT_RGB);
+      methods[4].method = invert(Effect.INVERT_LIGHTNESS);
     }
 
     return methods;

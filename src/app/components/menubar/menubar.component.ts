@@ -20,6 +20,7 @@ import { Alert } from 'src/app/classes/alert';
 import { Engine } from 'src/app/classes/engine';
 import { AlertType } from 'src/app/enums/alert-type';
 import { EditorStatus } from 'src/app/enums/editor-status';
+import { Effect } from 'src/app/enums/effect';
 import { EditorService } from 'src/app/services/editor.service';
 import { GUIService } from 'src/app/services/gui.service';
 
@@ -42,6 +43,8 @@ export class MenubarComponent {
   public readonly faShare: IconDefinition;
   public readonly faSquare: IconDefinition;
   public readonly faTrash: IconDefinition;
+
+  public readonly Effect = Effect;
 
   public constructor(private _editor: EditorService, private _gui: GUIService) {
     this.fa1 = fa1;

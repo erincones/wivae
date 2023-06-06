@@ -1,16 +1,16 @@
-import { Effect } from '../enums/effect';
+import { Program } from '../enums/program';
 import { fragment, vertex } from '../libs/shaders';
 
 export class ProgramsCollection {
   private _gl: WebGL2RenderingContext;
 
-  private _programs: Readonly<Record<Effect, WebGLProgram>>;
+  private _programs: Readonly<Record<Program, WebGLProgram>>;
 
   private _uniforms: Readonly<
-    Record<Effect, Map<string, WebGLUniformLocation | null>>
+    Record<Program, Map<string, WebGLUniformLocation | null>>
   >;
 
-  private _active: Effect | null;
+  private _active: Program | null;
 
   public constructor(gl: WebGL2RenderingContext) {
     this._gl = gl;
@@ -28,66 +28,66 @@ export class ProgramsCollection {
     } as const;
 
     this._programs = {
-      [Effect.VIEWER]: this._link(
+      [Program.VIEWER]: this._link(
         shaders.vertex.view,
         shaders.fragment.neutral
       ),
-      [Effect.ROTATE]: this._link(
+      [Program.ROTATE]: this._link(
         shaders.vertex.rotate,
         shaders.fragment.neutral
       ),
-      [Effect.FLIP_VERTICAL]: this._link(
+      [Program.FLIP_VERTICAL]: this._link(
         shaders.vertex.flipVertical,
         shaders.fragment.neutral
       ),
-      [Effect.FLIP_HORIZONTAL]: this._link(
+      [Program.FLIP_HORIZONTAL]: this._link(
         shaders.vertex.flipHorizontal,
         shaders.fragment.neutral
       ),
-      [Effect.GRAYSCALE_HSL_L]: this._link(
+      [Program.GRAYSCALE_HSL_L]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.grayscaleHSL
       ),
-      [Effect.GRAYSCALE_HSV_V]: this._link(
+      [Program.GRAYSCALE_HSV_V]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.grayscaleHSV
       ),
-      [Effect.GRAYSCALE_CIELAB_L]: this._link(
+      [Program.GRAYSCALE_CIELAB_L]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.grayscaleCIELAB
       ),
-      [Effect.GRAYSCALE_WEIGHT]: this._link(
+      [Program.GRAYSCALE_WEIGHT]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.grayscaleWeight
       ),
-      [Effect.INVERT_R]: this._link(
+      [Program.INVERT_R]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.invertR
       ),
-      [Effect.INVERT_G]: this._link(
+      [Program.INVERT_G]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.invertG
       ),
-      [Effect.INVERT_B]: this._link(
+      [Program.INVERT_B]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.invertB
       ),
-      [Effect.INVERT_RGB]: this._link(
+      [Program.INVERT_RGB]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.invertRGB
       ),
-      [Effect.INVERT_LIGHTNESS]: this._link(
+      [Program.INVERT_LIGHTNESS]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.invertLightness
       ),
     };
 
-    this._uniforms = Object.values(Effect).reduce((uniforms, effect) => {
+    this._uniforms = Object.values(Program).reduce((uniforms, effect) => {
       if (typeof effect !== 'string')
         uniforms[effect] = new Map<string, WebGLUniformLocation>();
 
       return uniforms;
-    }, {} as Record<Effect, Map<string, WebGLUniformLocation | null>>);
+    }, {} as Record<Program, Map<string, WebGLUniformLocation | null>>);
 
     Object.values(shaders).forEach((array) => {
       Object.values(array).forEach((shader) => {
@@ -171,7 +171,7 @@ export class ProgramsCollection {
     return program;
   }
 
-  public use(program: Effect | null): void {
+  public use(program: Program | null): void {
     if (this._active === program) return;
 
     this._active = program;

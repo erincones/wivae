@@ -79,7 +79,7 @@
   type="button"
   title="Rotate right 90°"
   [disabled]="disabled"
-  (click)="engine?.rotateRight()"
+  (click)="engine?.apply(Effect.ROTATE_90)"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faRotateRight"></fa-icon>
@@ -88,7 +88,7 @@
   type="button"
   title="Rotate left 90°"
   [disabled]="disabled"
-  (click)="engine?.rotateLeft()"
+  (click)="engine?.apply(Effect.ROTATE_270)"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faRotateLeft"></fa-icon>
@@ -97,7 +97,7 @@
   type="button"
   title="Flip vertical"
   [disabled]="disabled"
-  (click)="engine?.flipVertical()"
+  (click)="engine?.apply(Effect.FLIP_VERTICAL)"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faRightLeft" [rotate]="90"></fa-icon>
@@ -105,7 +105,7 @@
 <button
   type="button"
   title="Flip horizontal"
-  (click)="engine?.flipHorizontal()"
+  (click)="engine?.apply(Effect.FLIP_HORIZONTAL)"
   [disabled]="disabled"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >

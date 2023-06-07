@@ -41,6 +41,8 @@ export class Engine {
 
   private _imageSize: vec2;
 
+  private _view: mat4;
+
   private _ratio: vec2;
 
   private _bg: vec3;
@@ -58,6 +60,7 @@ export class Engine {
     this._file = file;
     this._imageSize = vec2.new(this._image.width, this._image.height);
     this._canvasSize = vec2.zero();
+    this._view = mat4.new(1);
     this._ratio = vec2.zero();
     this._bg = vec3.new(248, 250, 252);
     this._position = vec2.zero();
@@ -108,14 +111,9 @@ export class Engine {
   }
 
   private _updateView(): void {
-    this._program.use(Program.VIEWER);
-    this._gl.uniformMatrix4fv(
-      this._program.getUniformLocation('u_view'),
-      false,
-      mat4.translate(
-        mat4.scale(mat4.new(1), vec2.scale(this._ratio, this._zoom)),
-        this._position
-      )
+    this._view = mat4.translate(
+      mat4.scale(mat4.new(1), vec2.scale(this._ratio, this._zoom)),
+      this._position
     );
   }
 
@@ -172,7 +170,16 @@ export class Engine {
       this._updateRatio();
     }
 
-    this._drawEffect({ program: Program.VIEWER, resolution: this._canvasSize });
+    this._drawEffect({
+      program: Program.VIEWER,
+      resolution: this._canvasSize,
+      params: {
+        u_view: {
+          type: Uniform.FLOAT_MAT4,
+          value: this._view,
+        },
+      },
+    });
   }
 
   public get file(): File {
@@ -315,7 +322,7 @@ export class Engine {
 
     switch (effect) {
       case Effect.ROTATE_90:
-        program = Program.ROTATE;
+        program = Program.VIEWER;
         resolution = vec2.new(this._imageSize[1], this._imageSize[0]);
         params = {
           u_view: {
@@ -325,7 +332,7 @@ export class Engine {
         };
         break;
       case Effect.ROTATE_270:
-        program = Program.ROTATE;
+        program = Program.VIEWER;
         resolution = vec2.new(this._imageSize[1], this._imageSize[0]);
         params = {
           u_view: {
@@ -335,13 +342,25 @@ export class Engine {
         };
         break;
       case Effect.ROTATE_MANUAL:
-        program = Program.ROTATE;
+        program = Program.VIEWER;
         break;
       case Effect.FLIP_VERTICAL:
-        program = Program.FLIP_VERTICAL;
+        program = Program.VIEWER;
+        params = {
+          u_view: {
+            type: Uniform.FLOAT_MAT4,
+            value: mat4.scale(mat4.new(1), vec2.new(1, -1)),
+          },
+        };
         break;
       case Effect.FLIP_HORIZONTAL:
-        program = Program.FLIP_HORIZONTAL;
+        program = Program.VIEWER;
+        params = {
+          u_view: {
+            type: Uniform.FLOAT_MAT4,
+            value: mat4.scale(mat4.new(1), vec2.new(-1, 1)),
+          },
+        };
         break;
       case Effect.GRAYSCALE_HSL_L:
         program = Program.GRAYSCALE_HSL_L;
@@ -418,20 +437,104 @@ export class Engine {
       case Effect.GRAYSCALE_MANUAL:
         program = Program.GRAYSCALE_WEIGHT;
         break;
-      case Effect.INVERT_R:
-        program = Program.INVERT_R;
-        break;
-      case Effect.INVERT_G:
-        program = Program.INVERT_G;
-        break;
-      case Effect.INVERT_B:
-        program = Program.INVERT_B;
-        break;
       case Effect.INVERT_RGB:
         program = Program.INVERT_RGB;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(1, 1, 1),
+          },
+        };
         break;
-      case Effect.INVERT_LIGHTNESS:
-        program = Program.INVERT_LIGHTNESS;
+      case Effect.INVERT_R:
+        program = Program.INVERT_RGB;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(1, 0, 0),
+          },
+        };
+        break;
+      case Effect.INVERT_G:
+        program = Program.INVERT_RGB;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0, 1, 0),
+          },
+        };
+        break;
+      case Effect.INVERT_B:
+        program = Program.INVERT_RGB;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0, 0, 1),
+          },
+        };
+        break;
+      case Effect.INVERT_HSL:
+        program = Program.INVERT_HSL;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(1, 1, 1),
+          },
+        };
+        break;
+      case Effect.INVERT_HSL_S:
+        program = Program.INVERT_HSL;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0, 1, 0),
+          },
+        };
+        break;
+      case Effect.INVERT_HSL_L:
+        program = Program.INVERT_HSL;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0, 0, 1),
+          },
+        };
+        break;
+      case Effect.INVERT_HSV:
+        program = Program.INVERT_HSV;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(1, 1, 1),
+          },
+        };
+        break;
+      case Effect.INVERT_HSV_S:
+        program = Program.INVERT_HSV;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0, 1, 0),
+          },
+        };
+        break;
+      case Effect.INVERT_HSV_V:
+        program = Program.INVERT_HSV;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(0, 0, 1),
+          },
+        };
+        break;
+      case Effect.INVERT_HUE:
+        program = Program.INVERT_HSL;
+        params = {
+          u_weight: {
+            type: Uniform.FLOAT_VEC3,
+            value: vec3.new(1, 0, 0),
+          },
+        };
         break;
       default:
         program = Program.VIEWER;

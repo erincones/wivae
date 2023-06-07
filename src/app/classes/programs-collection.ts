@@ -32,18 +32,6 @@ export class ProgramsCollection {
         shaders.vertex.view,
         shaders.fragment.neutral
       ),
-      [Program.ROTATE]: this._link(
-        shaders.vertex.rotate,
-        shaders.fragment.neutral
-      ),
-      [Program.FLIP_VERTICAL]: this._link(
-        shaders.vertex.flipVertical,
-        shaders.fragment.neutral
-      ),
-      [Program.FLIP_HORIZONTAL]: this._link(
-        shaders.vertex.flipHorizontal,
-        shaders.fragment.neutral
-      ),
       [Program.GRAYSCALE_HSL_L]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.grayscaleHSL
@@ -60,25 +48,17 @@ export class ProgramsCollection {
         shaders.vertex.neutral,
         shaders.fragment.grayscaleWeight
       ),
-      [Program.INVERT_R]: this._link(
-        shaders.vertex.neutral,
-        shaders.fragment.invertR
-      ),
-      [Program.INVERT_G]: this._link(
-        shaders.vertex.neutral,
-        shaders.fragment.invertG
-      ),
-      [Program.INVERT_B]: this._link(
-        shaders.vertex.neutral,
-        shaders.fragment.invertB
-      ),
       [Program.INVERT_RGB]: this._link(
         shaders.vertex.neutral,
         shaders.fragment.invertRGB
       ),
-      [Program.INVERT_LIGHTNESS]: this._link(
+      [Program.INVERT_HSL]: this._link(
         shaders.vertex.neutral,
-        shaders.fragment.invertLightness
+        shaders.fragment.invertHSL
+      ),
+      [Program.INVERT_HSV]: this._link(
+        shaders.vertex.neutral,
+        shaders.fragment.invertHSV
       ),
     };
 

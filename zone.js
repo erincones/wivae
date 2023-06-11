@@ -41,12 +41,12 @@
  *  (window as any).__Zone_enable_cross_context_check = true;
  *
  */
-import './zone-flags';
+window['__zone_symbol__PASSIVE_EVENTS'] = ['wheel'];
 
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
-import 'zone.js'; // Included with Angular CLI.
+require('zone.js/dist/zone.js'); // Included with Angular CLI.
 
 /***************************************************************************************************
  * APPLICATION IMPORTS

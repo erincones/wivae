@@ -1,32 +1,36 @@
 import { Injectable } from '@angular/core';
 import { Alert } from '../classes/alert';
+import { GUI } from '../enums/gui';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GUIService {
-  private _showToolbar: boolean;
-
-  private _showInfobar: boolean;
+  private _show: Record<GUI, boolean>;
 
   private _alerts: Readonly<Alert>[];
 
   public constructor() {
-    this._showToolbar = true;
-    this._showInfobar = true;
+    this._show = {
+      [GUI.TOOLBAR]: true,
+      [GUI.INVERT]: false,
+      [GUI.GRAYSCALE]: false,
+      [GUI.INFOBAR]: true,
+      [GUI.FILE_INFO]: true,
+    };
     this._alerts = [];
   }
 
-  public get showToolbar(): boolean {
-    return this._showToolbar;
-  }
-
-  public get showInfobar(): boolean {
-    return this._showInfobar;
+  public get show(): Readonly<GUIService['_show']> {
+    return this._show;
   }
 
   public get alerts(): ReadonlyArray<Readonly<Alert>> {
     return this._alerts;
+  }
+
+  public toggleComponent(component: GUI): void {
+    this._show[component] = !this._show[component];
   }
 
   public pushAlert(alert: Readonly<Alert>): void {
@@ -43,13 +47,5 @@ export class GUIService {
 
   public clearAlerts(): void {
     this._alerts = [];
-  }
-
-  public toggleToolbar(): void {
-    this._showToolbar = !this._showToolbar;
-  }
-
-  public toggleInfobar(): void {
-    this._showInfobar = !this._showInfobar;
   }
 }

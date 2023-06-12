@@ -1,6 +1,6 @@
 <button
   type="button"
-  (click)="open = !open"
+  (click)="toggle()"
   class="flex w-full items-center justify-between border-b border-slate-400 bg-slate-300 px-2 text-slate-700"
 >
   <h6 class="font-semibold">{{ name }}</h6>
@@ -9,6 +9,9 @@
     class="text-xs"
   ></fa-icon>
 </button>
-<div *ngIf="open" class="px-4 py-2 text-sm text-slate-600 shadow-inner">
+<div
+  class="px-4 py-2 text-sm text-slate-600 shadow-inner"
+  [ngClass]="{ hidden: !open }"
+>
   <ng-content></ng-content>
 </div>

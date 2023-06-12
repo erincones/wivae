@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { GUI } from 'src/app/enums/gui';
+import { GUIService } from 'src/app/services/gui.service';
 
 @Component({
   selector: 'wivae-section',
   templateUrl: './section.component.html',
-  styleUrls: ['./section.component.scss'],
 })
 export class SectionComponent {
   public readonly faChevronDown: IconDefinition;
@@ -15,13 +16,21 @@ export class SectionComponent {
   @Input()
   public name: string;
 
-  @Input()
-  public open: boolean;
+  @Input({ required: true })
+  public component: GUI;
 
-  public constructor() {
+  public constructor(private _gui: GUIService) {
     this.faChevronDown = faChevronDown;
     this.faChevronUp = faChevronUp;
-    this.open = false;
     this.name = '';
+    this.component = GUI.FILE_INFO;
+  }
+
+  public get open(): boolean {
+    return this._gui.show[this.component];
+  }
+
+  public toggle(): void {
+    this._gui.toggleComponent(this.component);
   }
 }

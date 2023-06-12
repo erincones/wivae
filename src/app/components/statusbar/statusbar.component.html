@@ -1,11 +1,11 @@
 <button
   type="button"
   [title]="'Show toolbar'"
-  (click)="gui.toggleToolbar()"
+  (click)="toggleToolbar()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
   <fa-icon [icon]="faPenRuler"></fa-icon>
-  <fa-icon [icon]="gui.showToolbar ? faCaretLeft : faCaretRight"></fa-icon>
+  <fa-icon [icon]="showToolbar ? faCaretLeft : faCaretRight"></fa-icon>
 </button>
 
 <span class="mx-2 border-l border-slate-400"></span>
@@ -21,9 +21,9 @@
 <button
   type="button"
   [title]="'Show information'"
-  (click)="gui.toggleInfobar()"
+  (click)="toggleInfobar()"
   class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
 >
-  <fa-icon [icon]="gui.showInfobar ? faCaretRight : faCaretLeft"></fa-icon>
+  <fa-icon [icon]="showInfobar ? faCaretRight : faCaretLeft"></fa-icon>
   <fa-icon [icon]="faInfo"></fa-icon>
 </button>

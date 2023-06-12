@@ -1,0 +1,7 @@
+export enum GUI {
+  TOOLBAR,
+  INVERT,
+  GRAYSCALE,
+  INFOBAR,
+  FILE_INFO,
+}

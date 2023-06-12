@@ -5,6 +5,7 @@ import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 import { EditorStatus } from './enums/editor-status';
 import { EditorService } from './services/editor.service';
 import { GUIService } from './services/gui.service';
+import { GUI } from './enums/gui';
 
 @Component({
   selector: 'wivae-root',
@@ -17,10 +18,18 @@ export class AppComponent {
 
   public constructor(
     private _faConfig: FaConfig,
-    public editor: EditorService,
-    public gui: GUIService
+    private _gui: GUIService,
+    public editor: EditorService
   ) {
     this._faConfig.fixedWidth = true;
     this.faCircleNotch = faCircleNotch;
+  }
+
+  public get showToolbar(): boolean {
+    return this._gui.show[GUI.TOOLBAR];
+  }
+
+  public get showInfobar(): boolean {
+    return this._gui.show[GUI.INFOBAR];
   }
 }

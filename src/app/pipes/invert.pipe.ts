@@ -4,7 +4,7 @@ import { Effect } from '../enums/effect';
 
 interface InvertMethod {
   name: string;
-  method: () => void;
+  callback: () => void;
 }
 
 @Pipe({
@@ -12,19 +12,21 @@ interface InvertMethod {
 })
 export class InvertPipe implements PipeTransform {
   transform(engine: Engine | undefined): ReadonlyArray<Readonly<InvertMethod>> {
-    const dummy = () => {};
+    const dummy = () => {
+      return;
+    };
     const methods: InvertMethod[] = [
-      { name: 'RGB', method: dummy },
-      { name: 'HSL', method: dummy },
-      { name: 'HSV', method: dummy },
-      { name: 'Hue', method: dummy },
-      { name: 'HSL Light', method: dummy },
-      { name: 'HSV Value', method: dummy },
-      { name: 'Red', method: dummy },
-      { name: 'Green', method: dummy },
-      { name: 'Blue', method: dummy },
-      { name: 'HSL Saturation', method: dummy },
-      { name: 'HSV Saturation', method: dummy },
+      { name: 'RGB', callback: dummy },
+      { name: 'HSL', callback: dummy },
+      { name: 'HSV', callback: dummy },
+      { name: 'Hue', callback: dummy },
+      { name: 'HSL Light', callback: dummy },
+      { name: 'HSV Value', callback: dummy },
+      { name: 'Red', callback: dummy },
+      { name: 'Green', callback: dummy },
+      { name: 'Blue', callback: dummy },
+      { name: 'HSL Saturation', callback: dummy },
+      { name: 'HSV Saturation', callback: dummy },
     ];
 
     if (engine !== undefined) {
@@ -32,17 +34,17 @@ export class InvertPipe implements PipeTransform {
         engine.apply(effect);
       };
 
-      methods[0].method = invert(Effect.INVERT_RGB);
-      methods[1].method = invert(Effect.INVERT_HSL);
-      methods[2].method = invert(Effect.INVERT_HSV);
-      methods[3].method = invert(Effect.INVERT_HUE);
-      methods[4].method = invert(Effect.INVERT_HSL_L);
-      methods[5].method = invert(Effect.INVERT_HSV_V);
-      methods[6].method = invert(Effect.INVERT_R);
-      methods[7].method = invert(Effect.INVERT_G);
-      methods[8].method = invert(Effect.INVERT_B);
-      methods[9].method = invert(Effect.INVERT_HSL_S);
-      methods[10].method = invert(Effect.INVERT_HSV_S);
+      methods[0].callback = invert(Effect.INVERT_RGB);
+      methods[1].callback = invert(Effect.INVERT_HSL);
+      methods[2].callback = invert(Effect.INVERT_HSV);
+      methods[3].callback = invert(Effect.INVERT_HUE);
+      methods[4].callback = invert(Effect.INVERT_HSL_L);
+      methods[5].callback = invert(Effect.INVERT_HSV_V);
+      methods[6].callback = invert(Effect.INVERT_R);
+      methods[7].callback = invert(Effect.INVERT_G);
+      methods[8].callback = invert(Effect.INVERT_B);
+      methods[9].callback = invert(Effect.INVERT_HSL_S);
+      methods[10].callback = invert(Effect.INVERT_HSV_S);
     }
 
     return methods;

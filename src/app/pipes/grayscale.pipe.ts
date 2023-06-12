@@ -4,7 +4,7 @@ import { Effect } from '../enums/effect';
 
 interface GrayscaleMethod {
   name: string;
-  method: () => void;
+  callback: () => void;
 }
 
 @Pipe({
@@ -14,18 +14,20 @@ export class GrayscalePipe implements PipeTransform {
   transform(
     engine: Engine | undefined
   ): ReadonlyArray<Readonly<GrayscaleMethod>> {
-    const dummy = () => {};
+    const dummy = () => {
+      return;
+    };
     const methods: GrayscaleMethod[] = [
-      { name: 'HSL', method: dummy },
-      { name: 'HSV', method: dummy },
-      { name: 'CIE L*a*b*', method: dummy },
-      { name: 'Rec. 601', method: dummy },
-      { name: 'Rec. 709', method: dummy },
-      { name: 'Rec. 2100', method: dummy },
-      { name: 'Average', method: dummy },
-      { name: 'Red channel', method: dummy },
-      { name: 'Green channel', method: dummy },
-      { name: 'Blue channel', method: dummy },
+      { name: 'HSL', callback: dummy },
+      { name: 'HSV', callback: dummy },
+      { name: 'CIE L*a*b*', callback: dummy },
+      { name: 'Rec. 601', callback: dummy },
+      { name: 'Rec. 709', callback: dummy },
+      { name: 'Rec. 2100', callback: dummy },
+      { name: 'Average', callback: dummy },
+      { name: 'Red channel', callback: dummy },
+      { name: 'Green channel', callback: dummy },
+      { name: 'Blue channel', callback: dummy },
     ];
 
     if (engine !== undefined) {
@@ -33,16 +35,16 @@ export class GrayscalePipe implements PipeTransform {
         engine.apply(effect);
       };
 
-      methods[0].method = grayscale(Effect.GRAYSCALE_HSL_L);
-      methods[1].method = grayscale(Effect.GRAYSCALE_HSV_V);
-      methods[2].method = grayscale(Effect.GRAYSCALE_CIELAB_L);
-      methods[3].method = grayscale(Effect.GRAYSCALE_REC_601);
-      methods[4].method = grayscale(Effect.GRAYSCALE_REC_709);
-      methods[5].method = grayscale(Effect.GRAYSCALE_REC_2100);
-      methods[6].method = grayscale(Effect.GRAYSCALE_AVG);
-      methods[7].method = grayscale(Effect.GRAYSCALE_R);
-      methods[8].method = grayscale(Effect.GRAYSCALE_G);
-      methods[9].method = grayscale(Effect.GRAYSCALE_B);
+      methods[0].callback = grayscale(Effect.GRAYSCALE_HSL_L);
+      methods[1].callback = grayscale(Effect.GRAYSCALE_HSV_V);
+      methods[2].callback = grayscale(Effect.GRAYSCALE_CIELAB_L);
+      methods[3].callback = grayscale(Effect.GRAYSCALE_REC_601);
+      methods[4].callback = grayscale(Effect.GRAYSCALE_REC_709);
+      methods[5].callback = grayscale(Effect.GRAYSCALE_REC_2100);
+      methods[6].callback = grayscale(Effect.GRAYSCALE_AVG);
+      methods[7].callback = grayscale(Effect.GRAYSCALE_R);
+      methods[8].callback = grayscale(Effect.GRAYSCALE_G);
+      methods[9].callback = grayscale(Effect.GRAYSCALE_B);
     }
 
     return methods;

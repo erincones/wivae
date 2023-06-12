@@ -1,2 +1,10 @@
-<wivae-invert></wivae-invert>
-<wivae-grayscale></wivae-grayscale>
+<wivae-grayscale-manual
+  [ngClass]="{ hidden: !(gui | showComponent : GUI.GRAYSCALE_MANUAL) }"
+></wivae-grayscale-manual>
+
+<wivae-invert
+  [ngClass]="{ hidden: gui | showComponent : GUI.GRAYSCALE_MANUAL }"
+></wivae-invert>
+<wivae-grayscale
+  [ngClass]="{ hidden: gui | showComponent : GUI.GRAYSCALE_MANUAL }"
+></wivae-grayscale>

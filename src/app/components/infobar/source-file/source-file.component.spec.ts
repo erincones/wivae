@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FileInfoComponent } from './file-info.component';
+import { SourceFileComponent } from './source-file.component';
 
-describe('FileInfoComponent', () => {
-  let component: FileInfoComponent;
-  let fixture: ComponentFixture<FileInfoComponent>;
+describe('SourceFileComponent', () => {
+  let component: SourceFileComponent;
+  let fixture: ComponentFixture<SourceFileComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FileInfoComponent],
+      declarations: [SourceFileComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(FileInfoComponent);
+    fixture = TestBed.createComponent(SourceFileComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

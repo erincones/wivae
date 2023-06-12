@@ -7,9 +7,9 @@ interface InfoField {
 }
 
 @Pipe({
-  name: 'fileInfo',
+  name: 'sourceFile',
 })
-export class FileInfoPipe implements PipeTransform {
+export class SourceFilePipe implements PipeTransform {
   transform(file: File | undefined): InfoField[] {
     const info = [
       { label: 'Name', value: '', id: 'file-name' },

@@ -8,20 +8,23 @@ import { AlertComponent } from './components/alerts/alerts.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
 import { InfobarComponent } from './components/infobar/infobar.component';
 import { MenubarComponent } from './components/menubar/menubar.component';
-import { ModalComponent } from './components/modal/modal.component';
 import { SectionComponent } from './components/section/section.component';
+import { SidebarDialogComponent } from './components/sidebar-dialog/sidebar-dialog.component';
 import { StatusbarComponent } from './components/statusbar/statusbar.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { UploaderComponent } from './components/uploader/uploader.component';
 
-import { FileInfoComponent } from './components/infobar/file-info/file-info.component';
+import { SourceFileComponent } from './components/infobar/source-file/source-file.component';
 import { GrayscaleComponent } from './components/toolbar/grayscale/grayscale.component';
+import { GrayscaleManualComponent } from './components/toolbar/grayscale-manual/grayscale-manual.component';
+import { InvertComponent } from './components/toolbar/invert/invert.component';
 
-import { FileInfoPipe } from './pipes/file-info.pipe';
+import { ShowComponentPipe } from './pipes/show-component.pipe';
+import { SourceFilePipe } from './pipes/source-file.pipe';
 import { SummaryPipe } from './pipes/summary.pipe';
 import { GrayscalePipe } from './pipes/grayscale.pipe';
-import { InvertComponent } from './components/toolbar/invert/invert.component';
 import { InvertPipe } from './pipes/invert.pipe';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -30,20 +33,27 @@ import { InvertPipe } from './pipes/invert.pipe';
     CanvasComponent,
     InfobarComponent,
     MenubarComponent,
-    ModalComponent,
     SectionComponent,
+    SidebarDialogComponent,
     StatusbarComponent,
     ToolbarComponent,
     UploaderComponent,
-    FileInfoComponent,
+    SourceFileComponent,
     GrayscaleComponent,
-    FileInfoPipe,
+    GrayscaleManualComponent,
+    InvertComponent,
+    ShowComponentPipe,
+    SourceFilePipe,
     SummaryPipe,
     GrayscalePipe,
-    InvertComponent,
     InvertPipe,
   ],
-  imports: [BrowserModule, AppRoutingModule, FontAwesomeModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    FontAwesomeModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

@@ -3,14 +3,14 @@ import { GUI } from 'src/app/enums/gui';
 import { EditorService } from 'src/app/services/editor.service';
 
 @Component({
-  selector: 'wivae-file-info',
-  templateUrl: './file-info.component.html',
+  selector: 'wivae-source-file',
+  templateUrl: './source-file.component.html',
 })
-export class FileInfoComponent {
+export class SourceFileComponent {
   public readonly component: GUI;
 
   public constructor(public editor: EditorService) {
-    this.component = GUI.FILE_INFO;
+    this.component = GUI.SOURCE_FILE;
   }
 
   public get disabled(): true | null {

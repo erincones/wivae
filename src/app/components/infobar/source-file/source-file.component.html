@@ -1,9 +1,9 @@
 <wivae-section name="Source file" [component]="component">
   <table class="w-full border-separate border-spacing-y-1 text-sm">
     <tbody>
-      <tr *ngFor="let field of file | fileInfo">
-        <td class="mr-2 p-0">
-          <label [htmlFor]="field.id">{{ field.label }}</label>
+      <tr *ngFor="let field of file | sourceFile">
+        <td class="w-0 p-0">
+          <label [htmlFor]="field.id" class="mr-4">{{ field.label }}</label>
         </td>
         <td class="h-0 p-0">
           <input

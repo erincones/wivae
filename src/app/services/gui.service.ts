@@ -12,11 +12,13 @@ export class GUIService {
 
   public constructor() {
     this._show = {
+      [GUI.UNKNOWN]: false,
       [GUI.TOOLBAR]: true,
       [GUI.INVERT]: false,
       [GUI.GRAYSCALE]: false,
+      [GUI.GRAYSCALE_MANUAL]: false,
       [GUI.INFOBAR]: true,
-      [GUI.FILE_INFO]: true,
+      [GUI.SOURCE_FILE]: true,
     };
     this._alerts = [];
   }

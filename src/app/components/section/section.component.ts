@@ -19,18 +19,14 @@ export class SectionComponent {
   @Input({ required: true })
   public component: GUI;
 
-  public constructor(private _gui: GUIService) {
+  public constructor(public gui: GUIService) {
     this.faChevronDown = faChevronDown;
     this.faChevronUp = faChevronUp;
     this.name = '';
-    this.component = GUI.FILE_INFO;
-  }
-
-  public get open(): boolean {
-    return this._gui.show[this.component];
+    this.component = GUI.UNKNOWN;
   }
 
   public toggle(): void {
-    this._gui.toggleComponent(this.component);
+    this.gui.toggleComponent(this.component);
   }
 }

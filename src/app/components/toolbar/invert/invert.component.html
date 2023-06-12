@@ -5,7 +5,7 @@
         type="button"
         class="mb-1 w-full bg-slate-200 font-semibold hover:bg-blue-300 active:bg-blue-400 disabled:bg-slate-200 disabled:text-slate-400"
         [disabled]="disabled"
-        (click)="method.method()"
+        (click)="method.callback()"
       >
         {{ method.name }}
       </button>

@@ -12,24 +12,20 @@ import { GUI } from './enums/gui';
   templateUrl: './app.component.html',
 })
 export class AppComponent {
-  public readonly EditorStatus = EditorStatus;
+  public readonly GUI: typeof GUI;
+
+  public readonly EditorStatus: typeof EditorStatus;
 
   public readonly faCircleNotch: IconDefinition;
 
   public constructor(
     private _faConfig: FaConfig,
-    private _gui: GUIService,
-    public editor: EditorService
+    public editor: EditorService,
+    public gui: GUIService
   ) {
     this._faConfig.fixedWidth = true;
+    this.GUI = GUI;
+    this.EditorStatus = EditorStatus;
     this.faCircleNotch = faCircleNotch;
-  }
-
-  public get showToolbar(): boolean {
-    return this._gui.show[GUI.TOOLBAR];
-  }
-
-  public get showInfobar(): boolean {
-    return this._gui.show[GUI.INFOBAR];
   }
 }

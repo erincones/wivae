@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { GUI } from 'src/app/enums/gui';
 import { EditorService } from 'src/app/services/editor.service';
+import { GUIService } from 'src/app/services/gui.service';
 
 @Component({
   selector: 'wivae-grayscale',
@@ -9,11 +10,15 @@ import { EditorService } from 'src/app/services/editor.service';
 export class GrayscaleComponent {
   public readonly component: GUI;
 
-  public constructor(public editor: EditorService) {
+  public constructor(private _gui: GUIService, public editor: EditorService) {
     this.component = GUI.GRAYSCALE;
   }
 
   public get disabled(): true | null {
     return this.editor.engine === undefined || null;
+  }
+
+  public showManualGrayscale(): void {
+    this._gui.toggleComponent(GUI.GRAYSCALE_MANUAL);
   }
 }

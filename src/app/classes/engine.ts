@@ -541,7 +541,7 @@ export class Engine {
     }
 
     resolution = resolution || this._imageSize;
-    this._effect.pushEffect({ program, resolution, params });
+    this._effect.push({ program, resolution, params });
     this._draw();
   }
 
@@ -551,6 +551,10 @@ export class Engine {
 
   public redo(): void {
     if (this._effect.redo()) this._draw();
+  }
+
+  public clear(): void {
+    if (this._effect.clear()) this._draw();
   }
 
   public saveImage(): void {

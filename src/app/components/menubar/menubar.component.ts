@@ -6,6 +6,7 @@ import {
   faCircle,
   faDownload,
   faExpand,
+  faFileImage,
   faMagnifyingGlassMinus,
   faMagnifyingGlassPlus,
   faReply,
@@ -33,6 +34,7 @@ export class MenubarComponent {
   public readonly faCircle: IconDefinition;
   public readonly faDownload: IconDefinition;
   public readonly faExpand: IconDefinition;
+  public readonly faFileImage: IconDefinition;
   public readonly faUpload: IconDefinition;
   public readonly faMagnifyingGlassMinus: IconDefinition;
   public readonly faMagnifyingGlassPlus: IconDefinition;
@@ -51,6 +53,7 @@ export class MenubarComponent {
     this.faCircle = faCircle;
     this.faDownload = faDownload;
     this.faExpand = faExpand;
+    this.faFileImage = faFileImage;
     this.faMagnifyingGlassMinus = faMagnifyingGlassMinus;
     this.faMagnifyingGlassPlus = faMagnifyingGlassPlus;
     this.faReply = faReply;

@@ -16,6 +16,19 @@
 >
   <fa-icon [icon]="faDownload"></fa-icon>
 </button>
+
+<span class="mx-2 border-l border-slate-400"></span>
+
+<button
+  type="button"
+  title="Reset"
+  [disabled]="disabled || !engine?.history?.canUndo"
+  (click)="engine?.clear()"
+  class="hover:text-blue-800 focus:ring active:text-blue-900 disabled:text-slate-400"
+>
+  <fa-icon [icon]="faFileImage"></fa-icon>
+</button>
+
 <button
   type="button"
   title="Close"

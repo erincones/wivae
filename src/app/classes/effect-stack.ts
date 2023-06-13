@@ -185,7 +185,7 @@ export class EffectStack {
     );
   }
 
-  public pushEffect(effect: EffectData): void {
+  public push(effect: EffectData): void {
     if (this._to < this._stack.length) {
       this._stack.splice(this._to);
     }
@@ -194,10 +194,15 @@ export class EffectStack {
     this._to = this._stack.length;
   }
 
-  public clearEffects(): void {
-    this._stack = [];
-    this._from = 0;
-    this._to = 0;
+  public clear(): boolean {
+    if (this.canUndo) {
+      this._stack = [];
+      this._from = 0;
+      this._to = 0;
+      return true;
+    }
+
+    return false;
   }
 
   public undo(): boolean {

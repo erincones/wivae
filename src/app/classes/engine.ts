@@ -29,7 +29,7 @@ export class Engine {
 
   private _program!: ProgramsCollection;
 
-  private _effect!: EffectStack;
+  private _effectStack!: EffectStack;
 
   private _canvas!: HTMLCanvasElement;
 
@@ -151,7 +151,7 @@ export class Engine {
         }
       });
 
-    this._gl.viewport(0, 0, data.resolution[0], data.resolution[1]);
+    this._gl.viewport(0, 0, data.size[0], data.size[1]);
     this._gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
     this._gl.drawElements(
       WebGL2RenderingContext.TRIANGLE_STRIP,
@@ -162,7 +162,7 @@ export class Engine {
   }
 
   private _draw(): void {
-    const imageSize = this._effect.traverse(this._drawEffect.bind(this));
+    const imageSize = this._effectStack.traverse(this._drawEffect.bind(this));
 
     if (!vec2.equals(imageSize, this._imageSize)) {
       this._imageSize = imageSize;
@@ -172,7 +172,7 @@ export class Engine {
 
     this._drawEffect({
       program: Program.VIEWER,
-      resolution: this._canvasSize,
+      size: this._canvasSize,
       params: {
         u_view: {
           type: Uniform.FLOAT_MAT4,
@@ -182,148 +182,17 @@ export class Engine {
     });
   }
 
-  public get file(): File {
-    return this._file;
-  }
-
-  public get history(): Readonly<EffectStack> {
-    return this._effect;
-  }
-
-  public set bg(bg: vec3) {
-    this._bg = vec3.new(...bg);
-    this._gl.clearColor(...vec3.scale(this._bg, 1 / 255), 1);
-    this._draw();
-  }
-
-  public get bg(): vec3 {
-    return this._bg;
-  }
-
-  public get zoom(): number {
-    return this._zoom;
-  }
-
-  public get canZoomIn(): boolean {
-    return this._zoom < Engine._MAX_ZOOM;
-  }
-
-  public get canZoomOut(): boolean {
-    return this._zoom > this._minZoom;
-  }
-
-  public get fitted(): boolean {
-    return this._fitted;
-  }
-
-  public get realSized(): boolean {
-    return this._zoom === 1;
-  }
-
-  public setup(canvas: HTMLCanvasElement) {
-    this._canvas = canvas;
-    this._gl = this._canvas.getContext(
-      'webgl2',
-      Engine._CONTEXT_ATTRIBUTES
-    ) as WebGL2RenderingContext;
-    this._program = new ProgramsCollection(this._gl);
-
-    this._gl.clearColor(...vec3.scale(this._bg, 1 / 255), 1);
-    this._gl.enable(this._gl.BLEND);
-    this._gl.blendFunc(this._gl.SRC_ALPHA, this._gl.ONE_MINUS_SRC_ALPHA);
-
-    const vao = this._gl.createVertexArray();
-    this._gl.bindVertexArray(vao);
-
-    const vbo = this._gl.createBuffer();
-    this._gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, vbo);
-    this._gl.bufferData(
-      WebGL2RenderingContext.ARRAY_BUFFER,
-      Engine._SQUARE,
-      WebGL2RenderingContext.STATIC_DRAW
-    );
-
-    const ebo = this._gl.createBuffer();
-    this._gl.bindBuffer(this._gl.ELEMENT_ARRAY_BUFFER, ebo);
-    this._gl.bufferData(
-      WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER,
-      Engine._INDEXES,
-      WebGL2RenderingContext.STATIC_DRAW
-    );
-
-    this._gl.enableVertexAttribArray(0);
-    this._gl.vertexAttribPointer(0, 2, this._gl.FLOAT, false, 16, 0);
-
-    this._gl.enableVertexAttribArray(1);
-    this._gl.vertexAttribPointer(1, 2, this._gl.FLOAT, false, 16, 8);
-
-    this._effect = new EffectStack(this._gl, this._image);
-
-    this._program.use(Program.VIEWER);
-    this._gl.uniform1i(this._program.getUniformLocation('u_img'), 0);
-  }
-
-  public updateCanvasSize(): void {
-    const canvasSize = vec2.new(this._canvas.width, this._canvas.height);
-    if (vec2.equals(this._canvasSize, canvasSize)) return;
-
-    this._canvasSize = canvasSize;
-    this._updateRatio();
-    this._draw();
-  }
-
-  public translate(movement: vec2): void {
-    const position = this._translatePosition(this._projectPoint(movement));
-
-    if (!vec2.equals(position, this._position)) {
-      this._position = position;
-      this._updateView();
-      this._draw();
-    }
-  }
-
-  public setZoom(zoom: number, target = vec2.zero()): void {
-    if (zoom > Engine._MAX_ZOOM) zoom = Engine._MAX_ZOOM;
-    else if (zoom < this._minZoom) zoom = this._minZoom;
-
-    if (zoom !== this._zoom) {
-      const source = this._projectPoint(target);
-      this._zoom = zoom;
-      this._fitted = false;
-
-      this._position = this._translatePosition(
-        vec2.sub(source, this._projectPoint(target))
-      );
-      this._updateView();
-      this._draw();
-    }
-  }
-
-  public zoomIn(target?: vec2): void {
-    this.setZoom(this._zoom * Engine._ZOOM_FACTOR, target);
-  }
-
-  public zoomOut(target?: vec2): void {
-    this.setZoom(this._zoom / Engine._ZOOM_FACTOR, target);
-  }
-
-  public fit(): void {
-    this.setZoom(this._minZoom);
-    this._fitted = true;
-  }
-
-  public realSize(): void {
-    this.setZoom(1);
-  }
-
-  public apply(effect: Effect, params?: EffectData['params']): void {
-    let resolution: vec2 | undefined;
+  private _parseEffect(
+    effect: Effect,
+    params: EffectData['params']
+  ): EffectData {
+    let size: vec2 | undefined;
     let program: Program;
 
     switch (effect) {
       case Effect.ROTATE_90:
         program = Program.VIEWER;
-        resolution = vec2.new(this._imageSize[1], this._imageSize[0]);
+        size = vec2.new(this._imageSize[1], this._imageSize[0]);
         params = {
           u_view: {
             type: Uniform.FLOAT_MAT4,
@@ -333,7 +202,7 @@ export class Engine {
         break;
       case Effect.ROTATE_270:
         program = Program.VIEWER;
-        resolution = vec2.new(this._imageSize[1], this._imageSize[0]);
+        size = vec2.new(this._imageSize[1], this._imageSize[0]);
         params = {
           u_view: {
             type: Uniform.FLOAT_MAT4,
@@ -540,21 +409,172 @@ export class Engine {
         program = Program.VIEWER;
     }
 
-    resolution = resolution || this._imageSize;
-    this._effect.push({ program, resolution, params });
+    return { program, size: size || this._imageSize, params };
+  }
+
+  public get file(): File {
+    return this._file;
+  }
+
+  public get history(): Readonly<EffectStack> {
+    return this._effectStack;
+  }
+
+  public set bg(bg: vec3) {
+    this._bg = vec3.new(...bg);
+    this._gl.clearColor(...vec3.scale(this._bg, 1 / 255), 1);
+    this._draw();
+  }
+
+  public get bg(): vec3 {
+    return this._bg;
+  }
+
+  public get zoom(): number {
+    return this._zoom;
+  }
+
+  public get canZoomIn(): boolean {
+    return this._zoom < Engine._MAX_ZOOM;
+  }
+
+  public get canZoomOut(): boolean {
+    return this._zoom > this._minZoom;
+  }
+
+  public get fitted(): boolean {
+    return this._fitted;
+  }
+
+  public get realSized(): boolean {
+    return this._zoom === 1;
+  }
+
+  public setup(canvas: HTMLCanvasElement) {
+    this._canvas = canvas;
+    this._gl = this._canvas.getContext(
+      'webgl2',
+      Engine._CONTEXT_ATTRIBUTES
+    ) as WebGL2RenderingContext;
+    this._program = new ProgramsCollection(this._gl);
+
+    this._gl.clearColor(...vec3.scale(this._bg, 1 / 255), 1);
+    this._gl.enable(this._gl.BLEND);
+    this._gl.blendFunc(this._gl.SRC_ALPHA, this._gl.ONE_MINUS_SRC_ALPHA);
+
+    const vao = this._gl.createVertexArray();
+    this._gl.bindVertexArray(vao);
+
+    const vbo = this._gl.createBuffer();
+    this._gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, vbo);
+    this._gl.bufferData(
+      WebGL2RenderingContext.ARRAY_BUFFER,
+      Engine._SQUARE,
+      WebGL2RenderingContext.STATIC_DRAW
+    );
+
+    const ebo = this._gl.createBuffer();
+    this._gl.bindBuffer(this._gl.ELEMENT_ARRAY_BUFFER, ebo);
+    this._gl.bufferData(
+      WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER,
+      Engine._INDEXES,
+      WebGL2RenderingContext.STATIC_DRAW
+    );
+
+    this._gl.enableVertexAttribArray(0);
+    this._gl.vertexAttribPointer(0, 2, this._gl.FLOAT, false, 16, 0);
+
+    this._gl.enableVertexAttribArray(1);
+    this._gl.vertexAttribPointer(1, 2, this._gl.FLOAT, false, 16, 8);
+
+    this._effectStack = new EffectStack(this._gl, this._image);
+
+    this._program.use(Program.VIEWER);
+    this._gl.uniform1i(this._program.getUniformLocation('u_img'), 0);
+  }
+
+  public updateCanvasSize(): void {
+    const canvasSize = vec2.new(this._canvas.width, this._canvas.height);
+    if (vec2.equals(this._canvasSize, canvasSize)) return;
+
+    this._canvasSize = canvasSize;
+    this._updateRatio();
+    this._draw();
+  }
+
+  public translate(movement: vec2): void {
+    const position = this._translatePosition(this._projectPoint(movement));
+
+    if (!vec2.equals(position, this._position)) {
+      this._position = position;
+      this._updateView();
+      this._draw();
+    }
+  }
+
+  public setZoom(zoom: number, target = vec2.zero()): void {
+    if (zoom > Engine._MAX_ZOOM) zoom = Engine._MAX_ZOOM;
+    else if (zoom < this._minZoom) zoom = this._minZoom;
+
+    if (zoom !== this._zoom) {
+      const source = this._projectPoint(target);
+      this._zoom = zoom;
+      this._fitted = false;
+
+      this._position = this._translatePosition(
+        vec2.sub(source, this._projectPoint(target))
+      );
+      this._updateView();
+      this._draw();
+    }
+  }
+
+  public zoomIn(target?: vec2): void {
+    this.setZoom(this._zoom * Engine._ZOOM_FACTOR, target);
+  }
+
+  public zoomOut(target?: vec2): void {
+    this.setZoom(this._zoom / Engine._ZOOM_FACTOR, target);
+  }
+
+  public fit(): void {
+    this.setZoom(this._minZoom);
+    this._fitted = true;
+  }
+
+  public realSize(): void {
+    this.setZoom(1);
+  }
+
+  public preview(effect: Effect, params?: EffectData['params']): void {
+    this._effectStack.prepareNext(this._parseEffect(effect, params));
+    this._draw();
+  }
+
+  public acceptPreview(): void {
+    this._effectStack.acceptNext();
+  }
+
+  public cancelPreview(): void {
+    this._effectStack.cancelNext();
+    this._draw();
+  }
+
+  public apply(effect: Effect, params?: EffectData['params']): void {
+    this._effectStack.push(this._parseEffect(effect, params));
     this._draw();
   }
 
   public undo(): void {
-    if (this._effect.undo()) this._draw();
+    if (this._effectStack.undo()) this._draw();
   }
 
   public redo(): void {
-    if (this._effect.redo()) this._draw();
+    if (this._effectStack.redo()) this._draw();
   }
 
   public clear(): void {
-    if (this._effect.clear()) this._draw();
+    if (this._effectStack.clear()) this._draw();
   }
 
   public saveImage(): void {
@@ -590,6 +610,6 @@ export class Engine {
 
   public release(): void {
     this._program.release();
-    this._effect.release();
+    this._effectStack.release();
   }
 }

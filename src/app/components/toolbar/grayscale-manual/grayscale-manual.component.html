@@ -5,6 +5,7 @@
 >
   <form
     [formGroup]="form"
+    (change)="handleChange()"
     (submit)="handleSubmit()"
     (reset)="handleCancel($event)"
   >
@@ -17,12 +18,27 @@
           <td class="h-0 p-0">
             <input
               id="r-gs-m"
-              type="number"
               formControlName="red"
+              type="number"
               min="0"
               max="1"
               step="0.01"
+              [value]="form.value.red"
               class="m-0 h-full w-full border-slate-400 bg-slate-50 px-1 py-0 text-xs"
+            />
+          </td>
+        </tr>
+        <tr>
+          <td class="h-0 p-0" [colSpan]="2">
+            <input
+              formControlName="red"
+              type="range"
+              title="Red"
+              min="0"
+              max="1"
+              step="0.01"
+              [value]="form.value.red"
+              class="w-full"
             />
           </td>
         </tr>
@@ -33,12 +49,27 @@
           <td class="h-0 p-0">
             <input
               id="g-gs-m"
-              type="number"
               formControlName="green"
+              type="number"
               min="0"
               max="1"
               step="0.01"
+              [value]="form.value.green"
               class="m-0 h-full w-full border-slate-400 bg-slate-50 px-1 py-0 text-xs"
+            />
+          </td>
+        </tr>
+        <tr>
+          <td class="h-0 p-0" [colSpan]="2">
+            <input
+              formControlName="green"
+              type="range"
+              title="Green"
+              min="0"
+              max="1"
+              step="0.01"
+              [value]="form.value.green"
+              class="w-full"
             />
           </td>
         </tr>
@@ -49,27 +80,52 @@
           <td class="h-0 p-0">
             <input
               id="b-gs-m"
-              type="number"
               formControlName="blue"
+              type="number"
               min="0"
               max="1"
               step="0.01"
+              [value]="form.value.blue"
               class="m-0 h-full w-full border-slate-400 bg-slate-50 px-1 py-0 text-xs"
+            />
+          </td>
+        </tr>
+        <tr>
+          <td class="h-0 p-0" [colSpan]="2">
+            <input
+              formControlName="blue"
+              type="range"
+              title="Blue"
+              min="0"
+              max="1"
+              step="0.01"
+              [value]="form.value.blue"
+              class="w-full"
             />
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="flex w-full items-center justify-end space-x-2">
+    <div class="flex w-full items-center space-x-2">
+      <button
+        type="button"
+        [disabled]="!form.valid || null"
+        class="bg-slate-200 px-2 font-semibold hover:bg-blue-300 active:bg-blue-400 disabled:bg-slate-200 disabled:text-slate-400"
+        (click)="standarize()"
+      >
+        Standarize
+      </button>
+      <span class="flex-grow"></span>
       <button
         type="submit"
-        class="w-1/4 bg-slate-200 font-semibold hover:bg-blue-300 active:bg-blue-400 disabled:bg-slate-200 disabled:text-slate-400"
+        [disabled]="!form.valid || null"
+        class="bg-slate-200 px-2 font-semibold hover:bg-blue-300 active:bg-blue-400 disabled:bg-slate-200 disabled:text-slate-400"
       >
         Accept
       </button>
       <button
         type="reset"
-        class="w-1/4 bg-slate-200 font-semibold hover:bg-blue-300 active:bg-blue-400 disabled:bg-slate-200 disabled:text-slate-400"
+        class="bg-slate-200 px-2 font-semibold hover:bg-blue-300 active:bg-blue-400 disabled:bg-slate-200 disabled:text-slate-400"
       >
         Cancel
       </button>

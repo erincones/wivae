@@ -22,7 +22,7 @@ type EffectParam =
 
 export interface EffectData {
   readonly program: Program;
-  readonly resolution: vec2;
+  readonly size: vec2;
   readonly params?: Readonly<Record<string, EffectParam>>;
 }
 
@@ -37,11 +37,15 @@ export class EffectStack {
 
   private _fbo: WebGLFramebuffer[];
 
+  private _next?: EffectData;
+
   private _stack: EffectData[];
 
   private _from: number;
 
   private _to: number;
+
+  private _pending: boolean;
 
   public constructor(gl: WebGL2RenderingContext, image: HTMLImageElement) {
     this._gl = gl;
@@ -83,6 +87,7 @@ export class EffectStack {
     this._stack = [];
     this._from = 0;
     this._to = 0;
+    this._pending = false;
   }
 
   public get length(): number {
@@ -90,11 +95,11 @@ export class EffectStack {
   }
 
   public get canUndo(): boolean {
-    return this._to > 0;
+    return this._next === undefined && this._to > 0;
   }
 
   public get canRedo(): boolean {
-    return this._to < this._stack.length;
+    return this._next === undefined && this._to < this._stack.length;
   }
 
   private _createTexture(): WebGLTexture {
@@ -151,31 +156,50 @@ export class EffectStack {
     return fbo;
   }
 
-  public bindTexture(i: number | null = null): void {
-    this._gl.bindTexture(
-      WebGL2RenderingContext.TEXTURE_2D,
-      i === null ? this._source : this._texture[i]
-    );
-  }
-
-  private _resizeTexture(i: number, resolution: vec2): void {
+  private _resizeTexture(target: number, size: vec2): void {
     const currentTexture: WebGLTexture | null = this._gl.getParameter(
       WebGL2RenderingContext.TEXTURE_BINDING_2D
     );
 
-    this.bindTexture(i);
+    this.bindTexture(target);
     this._gl.texImage2D(
       WebGL2RenderingContext.TEXTURE_2D,
       0,
       WebGL2RenderingContext.RGBA,
-      resolution[0],
-      resolution[1],
+      size[0],
+      size[1],
       0,
       WebGL2RenderingContext.RGBA,
       WebGL2RenderingContext.UNSIGNED_BYTE,
       null
     );
     this._gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, currentTexture);
+  }
+
+  private _process(
+    callBack: (data: EffectData) => void,
+    curr: number,
+    effect: EffectData
+  ): EffectData {
+    this._resizeTexture(curr, effect.size);
+
+    this.bindFBO(curr);
+    callBack(effect);
+    this.bindTexture(curr);
+    this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
+
+    return effect;
+  }
+
+  public get waiting(): boolean {
+    return this._next !== undefined;
+  }
+
+  public bindTexture(i: number | null = null): void {
+    this._gl.bindTexture(
+      WebGL2RenderingContext.TEXTURE_2D,
+      i === null ? this._source : this._texture[i]
+    );
   }
 
   public bindFBO(i: number | null = null): void {
@@ -185,20 +209,41 @@ export class EffectStack {
     );
   }
 
-  public push(effect: EffectData): void {
-    if (this._to < this._stack.length) {
-      this._stack.splice(this._to);
-    }
+  public prepareNext(effect: EffectData): void {
+    this._next = effect;
+    this._pending = true;
+  }
 
-    this._stack.push(effect);
+  public acceptNext(): void {
+    if (this._next) {
+      const next = this._next;
+      this._pending = false;
+      delete this._next;
+      this.push(next);
+    }
+  }
+
+  public cancelNext(): void {
+    this._from = 0;
+    this._pending = false;
+    delete this._next;
+  }
+
+  public push(...effects: EffectData[]): void {
+    this.acceptNext();
+    if (this._to < this._stack.length) this._stack.splice(this._to);
+
+    this._stack.push(...effects);
     this._to = this._stack.length;
   }
 
   public clear(): boolean {
-    if (this.canUndo) {
+    if (this._stack.length || this._next) {
+      delete this._next;
       this._stack = [];
       this._from = 0;
       this._to = 0;
+      this._pending = false;
       return true;
     }
 
@@ -206,45 +251,49 @@ export class EffectStack {
   }
 
   public undo(): boolean {
-    if (this.canUndo) {
+    const can = this.canUndo;
+    if (can) {
       this._from = 0;
       --this._to;
-      return true;
     }
 
-    return false;
+    return can;
   }
 
   public redo(): boolean {
-    if (this.canRedo) {
-      ++this._to;
-      return true;
-    }
+    const can = this.canRedo;
+    if (can) ++this._to;
 
-    return false;
+    return can;
   }
 
   public traverse(callBack: (data: EffectData) => void): vec2 {
+    let effect: EffectData | undefined;
+    let curr: number;
+
     if (this._from === 0) this.bindTexture();
     if (this._from !== this._to) {
       for (let i = this._from; i < this._to; ++i) {
-        const curr = i & 1;
-        const effect = this._stack[i];
-
-        this._resizeTexture(curr, effect.resolution);
-        this.bindFBO(curr);
-        callBack(effect);
-        this.bindTexture(curr);
-        this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
+        effect = this._process(callBack, i & 1, this._stack[i]);
       }
 
       this._from = this._to;
     }
+    if (this._next && this._pending) {
+      if (this._to === 0) {
+        this.bindTexture();
+        curr = 0;
+      } else {
+        this.bindTexture((this._to - 1) & 1);
+        curr = this._to & 1;
+      }
+
+      effect = this._process(callBack, curr, this._next);
+      this._pending = false;
+    }
 
     this.bindFBO();
-    return this._to === 0
-      ? this._imageSize
-      : this._stack[this._to - 1].resolution;
+    return effect?.size || this._imageSize;
   }
 
   public release(): void {

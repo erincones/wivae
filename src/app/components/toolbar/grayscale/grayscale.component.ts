@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
+import { Effect } from 'src/app/enums/effect';
 import { GUI } from 'src/app/enums/gui';
+import { Uniform } from 'src/app/enums/uniform';
+import { vec3 } from 'src/app/libs/lar';
 import { EditorService } from 'src/app/services/editor.service';
 import { GUIService } from 'src/app/services/gui.service';
 
@@ -20,5 +23,11 @@ export class GrayscaleComponent {
 
   public showManualGrayscale(): void {
     this._gui.toggleComponent(GUI.GRAYSCALE_MANUAL);
+    this.editor.engine?.preview(Effect.GRAYSCALE_MANUAL, {
+      u_weight: {
+        type: Uniform.FLOAT_VEC3,
+        value: vec3.new(1 / 3, 1 / 3, 1 / 3),
+      },
+    });
   }
 }

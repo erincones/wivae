@@ -271,7 +271,7 @@ export class EffectStack {
     let effect: EffectData | undefined;
     let curr: number;
 
-    if (this._from === 0) this.bindTexture();
+    if (this._from === 0 && this._next === undefined) this.bindTexture();
     if (this._from !== this._to) {
       for (let i = this._from; i < this._to; ++i) {
         effect = this._process(callBack, i & 1, this._stack[i]);

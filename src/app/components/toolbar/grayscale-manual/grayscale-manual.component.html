@@ -5,6 +5,7 @@
 >
   <form
     [formGroup]="form"
+    (input)="handleChange()"
     (change)="handleChange()"
     (submit)="handleSubmit()"
     (reset)="handleCancel($event)"
@@ -21,9 +22,8 @@
               formControlName="red"
               type="number"
               min="0"
-              max="1"
+              max="100"
               step="0.01"
-              [value]="form.value.red"
               class="m-0 h-full w-full border-slate-400 bg-slate-50 px-1 py-0 text-xs"
             />
           </td>
@@ -31,14 +31,15 @@
         <tr>
           <td class="h-0 p-0" [colSpan]="2">
             <input
-              formControlName="red"
+              #red
               type="range"
               title="Red"
               min="0"
-              max="1"
+              max="100"
               step="0.01"
               [value]="form.value.red"
               class="w-full"
+              (input)="form.controls.red.setValue(red.valueAsNumber)"
             />
           </td>
         </tr>
@@ -52,9 +53,8 @@
               formControlName="green"
               type="number"
               min="0"
-              max="1"
+              max="100"
               step="0.01"
-              [value]="form.value.green"
               class="m-0 h-full w-full border-slate-400 bg-slate-50 px-1 py-0 text-xs"
             />
           </td>
@@ -62,14 +62,15 @@
         <tr>
           <td class="h-0 p-0" [colSpan]="2">
             <input
-              formControlName="green"
+              #green
               type="range"
               title="Green"
               min="0"
-              max="1"
+              max="100"
               step="0.01"
               [value]="form.value.green"
               class="w-full"
+              (input)="form.controls.green.setValue(green.valueAsNumber)"
             />
           </td>
         </tr>
@@ -83,9 +84,8 @@
               formControlName="blue"
               type="number"
               min="0"
-              max="1"
+              max="100"
               step="0.01"
-              [value]="form.value.blue"
               class="m-0 h-full w-full border-slate-400 bg-slate-50 px-1 py-0 text-xs"
             />
           </td>
@@ -93,14 +93,15 @@
         <tr>
           <td class="h-0 p-0" [colSpan]="2">
             <input
-              formControlName="blue"
+              #blue
               type="range"
               title="Blue"
               min="0"
-              max="1"
+              max="100"
               step="0.01"
               [value]="form.value.blue"
               class="w-full"
+              (input)="form.controls.blue.setValue(blue.valueAsNumber)"
             />
           </td>
         </tr>

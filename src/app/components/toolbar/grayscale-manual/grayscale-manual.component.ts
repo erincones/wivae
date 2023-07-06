@@ -15,6 +15,7 @@ import { GUIService } from 'src/app/services/gui.service';
 @Component({
   selector: 'wivae-grayscale-manual',
   templateUrl: './grayscale-manual.component.html',
+  styleUrls: ['./grayscale-manual.component.scss'],
 })
 export class GrayscaleManualComponent {
   public readonly component: GUI;
@@ -40,10 +41,10 @@ export class GrayscaleManualComponent {
     const validators = [
       Validators.required,
       Validators.min(0),
-      Validators.max(1),
+      Validators.max(100),
     ];
 
-    this._initial = { red: 1 / 3, green: 1 / 3, blue: 1 / 3 };
+    this._initial = { red: 100 / 3, green: 100 / 3, blue: 100 / 3 };
 
     this.form = this._fb.group({
       red: [this._initial.red, validators],
@@ -72,7 +73,7 @@ export class GrayscaleManualComponent {
 
       if (b < 0) b = 0;
       else if (b > 1) b = 1;
-    } while (r + g + b !== 1);
+    } while (r + g + b !== 100);
 
     this.form.setValue({ red: r, green: g, blue: b });
     this.handleChange();
@@ -85,9 +86,9 @@ export class GrayscaleManualComponent {
       u_weight: {
         type: Uniform.FLOAT_VEC3,
         value: vec3.new(
-          this.form.value.red || 0,
-          this.form.value.green || 0,
-          this.form.value.blue || 0
+          (this.form.value.red || 0) / 100,
+          (this.form.value.green || 0) / 100,
+          (this.form.value.blue || 0) / 100
         ),
       },
     });
@@ -101,6 +102,7 @@ export class GrayscaleManualComponent {
     this.form.reset(this._initial);
     this._gui.toggleComponent(GUI.GRAYSCALE_MANUAL);
   }
+
   public handleCancel(e: Event): void {
     e.preventDefault();
 

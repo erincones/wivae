@@ -34,8 +34,8 @@ export class GrayscaleManualComponent {
 
   public constructor(
     private _fb: FormBuilder,
+    private _editor: EditorService,
     private _gui: GUIService,
-    public editor: EditorService,
   ) {
     this.component = GUI.GRAYSCALE_MANUAL;
     const validators = [
@@ -82,7 +82,7 @@ export class GrayscaleManualComponent {
   public handleChange(): void {
     if (!this.form.valid) return;
 
-    this.editor.engine?.preview(Effect.GRAYSCALE_MANUAL, {
+    this._editor.engine?.preview(Effect.GRAYSCALE_MANUAL, {
       u_weight: {
         type: Uniform.FLOAT_VEC3,
         value: vec3.new(
@@ -97,7 +97,7 @@ export class GrayscaleManualComponent {
   public handleSubmit(): void {
     if (!this.form.valid) return;
 
-    this.editor.engine?.acceptPreview();
+    this._editor.engine?.acceptPreview();
 
     this.form.reset(this._initial);
     this._gui.toggleComponent(GUI.GRAYSCALE_MANUAL);
@@ -106,7 +106,7 @@ export class GrayscaleManualComponent {
   public handleCancel(e: Event): void {
     e.preventDefault();
 
-    this.editor.engine?.cancelPreview();
+    this._editor.engine?.cancelPreview();
 
     this.form.reset(this._initial);
     this._gui.toggleComponent(GUI.GRAYSCALE_MANUAL);

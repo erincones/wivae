@@ -31,6 +31,10 @@ export class GUIService {
     return this._alerts;
   }
 
+  public closeDialogs(): void {
+    this._show[GUI.GRAYSCALE_MANUAL] = false;
+  }
+
   public toggleComponent(component: GUI): void {
     this._show[component] = !this._show[component];
   }

@@ -99,5 +99,6 @@ export class MenubarComponent {
 
   public closeImage(): void {
     this._editor.closeImage();
+    this._gui.closeDialogs();
   }
 }

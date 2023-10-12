@@ -16,7 +16,7 @@ export type mat4 = [
   number,
   number,
   number,
-  number
+  number,
 ];
 
 export const vec2 = {

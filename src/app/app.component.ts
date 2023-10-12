@@ -21,7 +21,7 @@ export class AppComponent {
   public constructor(
     private _faConfig: FaConfig,
     public editor: EditorService,
-    public gui: GUIService
+    public gui: GUIService,
   ) {
     this._faConfig.fixedWidth = true;
     this.GUI = GUI;

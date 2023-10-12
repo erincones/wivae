@@ -20,7 +20,10 @@ export class StatusbarComponent {
   public readonly faPenRuler: IconDefinition;
   public readonly faInfo: IconDefinition;
 
-  public constructor(private _gui: GUIService, public editor: EditorService) {
+  public constructor(
+    private _gui: GUIService,
+    public editor: EditorService,
+  ) {
     this.faCaretLeft = faCaretLeft;
     this.faCaretRight = faCaretRight;
     this.faPenRuler = faPenRuler;

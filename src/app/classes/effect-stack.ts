@@ -59,7 +59,7 @@ export class EffectStack {
       WebGL2RenderingContext.RGBA,
       WebGL2RenderingContext.RGBA,
       WebGL2RenderingContext.UNSIGNED_BYTE,
-      image
+      image,
     );
     this._gl.generateMipmap(WebGL2RenderingContext.TEXTURE_2D);
     this._gl.pixelStorei(WebGL2RenderingContext.UNPACK_FLIP_Y_WEBGL, false);
@@ -78,7 +78,7 @@ export class EffectStack {
         0,
         WebGL2RenderingContext.RGBA,
         WebGL2RenderingContext.UNSIGNED_BYTE,
-        null
+        null,
       );
 
       this._fbo.push(this._createFrameBuffer(texture));
@@ -112,22 +112,22 @@ export class EffectStack {
     this._gl.texParameteri(
       WebGL2RenderingContext.TEXTURE_2D,
       WebGL2RenderingContext.TEXTURE_WRAP_S,
-      WebGL2RenderingContext.CLAMP_TO_EDGE
+      WebGL2RenderingContext.CLAMP_TO_EDGE,
     );
     this._gl.texParameteri(
       WebGL2RenderingContext.TEXTURE_2D,
       WebGL2RenderingContext.TEXTURE_WRAP_T,
-      WebGL2RenderingContext.CLAMP_TO_EDGE
+      WebGL2RenderingContext.CLAMP_TO_EDGE,
     );
     this._gl.texParameteri(
       WebGL2RenderingContext.TEXTURE_2D,
       WebGL2RenderingContext.TEXTURE_MAG_FILTER,
-      WebGL2RenderingContext.NEAREST
+      WebGL2RenderingContext.NEAREST,
     );
     this._gl.texParameteri(
       WebGL2RenderingContext.TEXTURE_2D,
       WebGL2RenderingContext.TEXTURE_MIN_FILTER,
-      WebGL2RenderingContext.LINEAR_MIPMAP_NEAREST
+      WebGL2RenderingContext.LINEAR_MIPMAP_NEAREST,
     );
 
     return texture;
@@ -144,7 +144,7 @@ export class EffectStack {
       WebGL2RenderingContext.COLOR_ATTACHMENT0,
       WebGL2RenderingContext.TEXTURE_2D,
       texture,
-      0
+      0,
     );
 
     if (
@@ -158,7 +158,7 @@ export class EffectStack {
 
   private _resizeTexture(target: number, size: vec2): void {
     const currentTexture: WebGLTexture | null = this._gl.getParameter(
-      WebGL2RenderingContext.TEXTURE_BINDING_2D
+      WebGL2RenderingContext.TEXTURE_BINDING_2D,
     );
 
     this.bindTexture(target);
@@ -171,7 +171,7 @@ export class EffectStack {
       0,
       WebGL2RenderingContext.RGBA,
       WebGL2RenderingContext.UNSIGNED_BYTE,
-      null
+      null,
     );
     this._gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, currentTexture);
   }
@@ -179,7 +179,7 @@ export class EffectStack {
   private _process(
     callBack: (data: EffectData) => void,
     curr: number,
-    effect: EffectData
+    effect: EffectData,
   ): EffectData {
     this._resizeTexture(curr, effect.size);
 
@@ -198,14 +198,14 @@ export class EffectStack {
   public bindTexture(i: number | null = null): void {
     this._gl.bindTexture(
       WebGL2RenderingContext.TEXTURE_2D,
-      i === null ? this._source : this._texture[i]
+      i === null ? this._source : this._texture[i],
     );
   }
 
   public bindFBO(i: number | null = null): void {
     this._gl.bindFramebuffer(
       WebGL2RenderingContext.FRAMEBUFFER,
-      i === null ? null : this._fbo[i]
+      i === null ? null : this._fbo[i],
     );
   }
 

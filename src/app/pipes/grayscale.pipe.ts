@@ -12,7 +12,7 @@ interface GrayscaleMethod {
 })
 export class GrayscalePipe implements PipeTransform {
   transform(
-    engine: Engine | undefined
+    engine: Engine | undefined,
   ): ReadonlyArray<Readonly<GrayscaleMethod>> {
     const dummy = () => {
       return;

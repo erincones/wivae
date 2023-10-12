@@ -11,7 +11,10 @@ import { GUIService } from 'src/app/services/gui.service';
 export class UploaderComponent {
   private _dragging: boolean;
 
-  constructor(private _editor: EditorService, private _gui: GUIService) {
+  constructor(
+    private _editor: EditorService,
+    private _gui: GUIService,
+  ) {
     this._dragging = false;
   }
 
@@ -42,7 +45,7 @@ export class UploaderComponent {
       })
       .catch((e: string) => {
         this._gui.pushAlert(
-          new Alert(AlertType.ERROR, `Cannot open the given file: ${e}`)
+          new Alert(AlertType.ERROR, `Cannot open the given file: ${e}`),
         );
       })
       .finally(() => {

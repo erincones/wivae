@@ -72,7 +72,7 @@ export class Engine {
   private _projectPoint(point: vec2): vec2 {
     return vec2.div(
       vec2.scale(point, (2 * devicePixelRatio) / this._zoom),
-      this._imageSize
+      this._imageSize,
     );
   }
 
@@ -80,9 +80,9 @@ export class Engine {
     const offset = vec2.div(
       vec2.scale(
         vec2.sub(vec2.scale(this._imageSize, this._zoom), this._canvasSize),
-        1 / this._zoom
+        1 / this._zoom,
       ),
-      this._imageSize
+      this._imageSize,
     );
 
     const position = vec2.add(this._position, translation);
@@ -113,7 +113,7 @@ export class Engine {
   private _updateView(): void {
     this._view = mat4.translate(
       mat4.scale(mat4.new(1), vec2.scale(this._ratio, this._zoom)),
-      this._position
+      this._position,
     );
   }
 
@@ -126,26 +126,26 @@ export class Engine {
           case Uniform.FLOAT:
             this._gl.uniform1f(
               this._program.getUniformLocation(name),
-              param.value
+              param.value,
             );
             break;
           case Uniform.FLOAT_VEC3:
             this._gl.uniform3fv(
               this._program.getUniformLocation(name),
-              param.value
+              param.value,
             );
             break;
           case Uniform.FLOAT_MAT4:
             this._gl.uniformMatrix4fv(
               this._program.getUniformLocation(name),
               false,
-              param.value
+              param.value,
             );
             break;
           case Uniform.FLOAT_ARRAY:
             this._gl.uniform1fv(
               this._program.getUniformLocation(name),
-              param.value
+              param.value,
             );
             break;
         }
@@ -157,7 +157,7 @@ export class Engine {
       WebGL2RenderingContext.TRIANGLE_STRIP,
       4,
       WebGL2RenderingContext.UNSIGNED_BYTE,
-      0
+      0,
     );
   }
 
@@ -184,7 +184,7 @@ export class Engine {
 
   private _parseEffect(
     effect: Effect,
-    params: EffectData['params']
+    params: EffectData['params'],
   ): EffectData {
     let size: vec2 | undefined;
     let program: Program;
@@ -454,7 +454,7 @@ export class Engine {
     this._canvas = canvas;
     this._gl = this._canvas.getContext(
       'webgl2',
-      Engine._CONTEXT_ATTRIBUTES
+      Engine._CONTEXT_ATTRIBUTES,
     ) as WebGL2RenderingContext;
     this._program = new ProgramsCollection(this._gl);
 
@@ -470,7 +470,7 @@ export class Engine {
     this._gl.bufferData(
       WebGL2RenderingContext.ARRAY_BUFFER,
       Engine._SQUARE,
-      WebGL2RenderingContext.STATIC_DRAW
+      WebGL2RenderingContext.STATIC_DRAW,
     );
 
     const ebo = this._gl.createBuffer();
@@ -478,7 +478,7 @@ export class Engine {
     this._gl.bufferData(
       WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER,
       Engine._INDEXES,
-      WebGL2RenderingContext.STATIC_DRAW
+      WebGL2RenderingContext.STATIC_DRAW,
     );
 
     this._gl.enableVertexAttribArray(0);
@@ -522,7 +522,7 @@ export class Engine {
       this._fitted = false;
 
       this._position = this._translatePosition(
-        vec2.sub(source, this._projectPoint(target))
+        vec2.sub(source, this._projectPoint(target)),
       );
       this._updateView();
       this._draw();

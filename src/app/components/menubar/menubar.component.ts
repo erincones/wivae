@@ -48,7 +48,10 @@ export class MenubarComponent {
 
   public readonly Effect = Effect;
 
-  public constructor(private _editor: EditorService, private _gui: GUIService) {
+  public constructor(
+    private _editor: EditorService,
+    private _gui: GUIService,
+  ) {
     this.fa1 = fa1;
     this.faCircle = faCircle;
     this.faDownload = faDownload;
@@ -89,7 +92,7 @@ export class MenubarComponent {
       })
       .catch((e: string) => {
         this._gui.pushAlert(
-          new Alert(AlertType.ERROR, `Cannot open the given file: ${e}`)
+          new Alert(AlertType.ERROR, `Cannot open the given file: ${e}`),
         );
       });
   }

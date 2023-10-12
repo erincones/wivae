@@ -35,7 +35,7 @@ export class GrayscaleManualComponent {
   public constructor(
     private _fb: FormBuilder,
     private _gui: GUIService,
-    public editor: EditorService
+    public editor: EditorService,
   ) {
     this.component = GUI.GRAYSCALE_MANUAL;
     const validators = [
@@ -88,7 +88,7 @@ export class GrayscaleManualComponent {
         value: vec3.new(
           (this.form.value.red || 0) / 100,
           (this.form.value.green || 0) / 100,
-          (this.form.value.blue || 0) / 100
+          (this.form.value.blue || 0) / 100,
         ),
       },
     });

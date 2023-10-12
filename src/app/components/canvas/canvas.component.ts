@@ -30,7 +30,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     private _cd: ChangeDetectorRef,
     private _host: ElementRef<HTMLDivElement>,
     private _gui: GUIService,
-    private _editor: EditorService
+    private _editor: EditorService,
   ) {
     this._observer = new ResizeObserver(this._updateCanvasSize.bind(this));
     this._moving = false;
@@ -85,7 +85,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
       this._updateCanvasSize();
     } catch (e) {
       this._gui.pushAlert(
-        new Alert(AlertType.ERROR, e instanceof Error ? e.message : String(e))
+        new Alert(AlertType.ERROR, e instanceof Error ? e.message : String(e)),
       );
       this._cd.detectChanges();
     }
@@ -114,7 +114,7 @@ export class CanvasComponent implements AfterViewInit, OnInit, OnDestroy {
     const dim = this._canvas.nativeElement.getBoundingClientRect();
     const target = vec2.new(
       dim.left + dim.width / 2 - e.x,
-      e.y - dim.top - dim.height / 2
+      e.y - dim.top - dim.height / 2,
     );
 
     if (e.deltaY < 0) engine.zoomIn(target);

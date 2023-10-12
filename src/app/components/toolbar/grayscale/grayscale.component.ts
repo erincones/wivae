@@ -13,7 +13,10 @@ import { GUIService } from 'src/app/services/gui.service';
 export class GrayscaleComponent {
   public readonly component: GUI;
 
-  public constructor(private _gui: GUIService, public editor: EditorService) {
+  public constructor(
+    private _gui: GUIService,
+    public editor: EditorService,
+  ) {
     this.component = GUI.GRAYSCALE;
   }
 

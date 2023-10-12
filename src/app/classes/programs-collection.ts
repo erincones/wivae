@@ -19,55 +19,58 @@ export class ProgramsCollection {
     const shaders = {
       vertex: this._compileShaders(
         vertex,
-        WebGL2RenderingContext.VERTEX_SHADER
+        WebGL2RenderingContext.VERTEX_SHADER,
       ),
       fragment: this._compileShaders(
         fragment,
-        WebGL2RenderingContext.FRAGMENT_SHADER
+        WebGL2RenderingContext.FRAGMENT_SHADER,
       ),
     } as const;
 
     this._programs = {
       [Program.VIEWER]: this._link(
         shaders.vertex.view,
-        shaders.fragment.neutral
+        shaders.fragment.neutral,
       ),
       [Program.GRAYSCALE_HSL_L]: this._link(
         shaders.vertex.neutral,
-        shaders.fragment.grayscaleHSL
+        shaders.fragment.grayscaleHSL,
       ),
       [Program.GRAYSCALE_HSV_V]: this._link(
         shaders.vertex.neutral,
-        shaders.fragment.grayscaleHSV
+        shaders.fragment.grayscaleHSV,
       ),
       [Program.GRAYSCALE_CIELAB_L]: this._link(
         shaders.vertex.neutral,
-        shaders.fragment.grayscaleCIELAB
+        shaders.fragment.grayscaleCIELAB,
       ),
       [Program.GRAYSCALE_WEIGHT]: this._link(
         shaders.vertex.neutral,
-        shaders.fragment.grayscaleWeight
+        shaders.fragment.grayscaleWeight,
       ),
       [Program.INVERT_RGB]: this._link(
         shaders.vertex.neutral,
-        shaders.fragment.invertRGB
+        shaders.fragment.invertRGB,
       ),
       [Program.INVERT_HSL]: this._link(
         shaders.vertex.neutral,
-        shaders.fragment.invertHSL
+        shaders.fragment.invertHSL,
       ),
       [Program.INVERT_HSV]: this._link(
         shaders.vertex.neutral,
-        shaders.fragment.invertHSV
+        shaders.fragment.invertHSV,
       ),
     };
 
-    this._uniforms = Object.values(Program).reduce((uniforms, effect) => {
-      if (typeof effect !== 'string')
-        uniforms[effect] = new Map<string, WebGLUniformLocation>();
+    this._uniforms = Object.values(Program).reduce(
+      (uniforms, effect) => {
+        if (typeof effect !== 'string')
+          uniforms[effect] = new Map<string, WebGLUniformLocation>();
 
-      return uniforms;
-    }, {} as Record<Program, Map<string, WebGLUniformLocation | null>>);
+        return uniforms;
+      },
+      {} as Record<Program, Map<string, WebGLUniformLocation | null>>,
+    );
 
     Object.values(shaders).forEach((array) => {
       Object.values(array).forEach((shader) => {
@@ -78,18 +81,21 @@ export class ProgramsCollection {
 
   private _compileShaders<T extends Record<string, string>>(
     shaders: T,
-    type: WebGL2RenderingContext['VERTEX_SHADER' | 'FRAGMENT_SHADER']
+    type: WebGL2RenderingContext['VERTEX_SHADER' | 'FRAGMENT_SHADER'],
   ): Readonly<Record<keyof T, WebGLShader>> {
-    return Object.entries(shaders).reduce((shaders, [name, code]) => {
-      shaders[name as keyof T] = this._compileShader(type, code, name);
-      return shaders;
-    }, {} as Record<keyof T, WebGLShader>);
+    return Object.entries(shaders).reduce(
+      (shaders, [name, code]) => {
+        shaders[name as keyof T] = this._compileShader(type, code, name);
+        return shaders;
+      },
+      {} as Record<keyof T, WebGLShader>,
+    );
   }
 
   private _compileShader(
     type: WebGL2RenderingContext['VERTEX_SHADER' | 'FRAGMENT_SHADER'],
     src: string,
-    name?: string
+    name?: string,
   ): WebGLShader {
     let stage: string;
     switch (type) {
@@ -114,7 +120,7 @@ export class ProgramsCollection {
     if (
       !this._gl.getShaderParameter(
         shader,
-        WebGL2RenderingContext.COMPILE_STATUS
+        WebGL2RenderingContext.COMPILE_STATUS,
       )
     ) {
       const message = `Could not compile the shader: ${log}\n${
